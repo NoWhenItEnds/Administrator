@@ -1,0 +1,9 @@
+[gd_scene load_steps=2 format=3 uid="uid://cy5t03qh6tfhb"]
+
+[ext_resource type="Theme" uid="uid://qfkw5jdkcnrm" path="res://Resources/Themes/Theme_Default.tres" id="1_5a20l"]
+
+[node name="ConsoleOutput" type="RichTextLabel"]
+theme = ExtResource("1_5a20l")
+bbcode_enabled = true
+fit_content = true
+vertical_alignment = 1

@@ -1,4 +1,5 @@
 using System;
+using Administrator.Utilities;
 using Godot;
 
 namespace Administrator.UI
@@ -14,12 +15,25 @@ namespace Administrator.UI
         [Export] private LineEdit _inputNode;
 
 
+        /// <summary> How many labels our object pool can contain. </summary>
+        [ExportGroup("Settings")]
+        [Export] private Int32 _outputPoolSize = 100;
+
+
+        /// <summary> The prefab used to spawn additional output labels. </summary>
+        [ExportGroup("Resources")]
+        [Export] private PackedScene _outputLabelPrefab;
+
+
         /// <summary> The user's current working directory. </summary>
         private String _pwdText = "/home/usr";
 
         /// <summary> The user's current input. </summary>
         private String _currentInput = String.Empty;
 
+        private ObjectPool<RichTextLabel> _outputPool;
+
+        /// <summary> The format to render the input text. </summary>
         private const String INPUT_FORMAT = "{0} > {1}";
 
 
@@ -33,6 +47,7 @@ namespace Administrator.UI
             _inputNode.TextChanged += OnInputChanged;
             _inputNode.TextSubmitted += OnInputSubmitted;
 
+            _outputPool = new ObjectPool<RichTextLabel>(_outputContainer, _outputLabelPrefab, _outputPoolSize);
             _inputNode.Text = String.Format(INPUT_FORMAT, _pwdText, String.Empty);
         }
 
@@ -68,11 +83,17 @@ namespace Administrator.UI
 
         private void OnInputSubmitted(String submittedText)
         {
-            GD.Print(_currentInput);
+            RichTextLabel newLabel = _outputPool.GetAvailableObject();
+            newLabel.Text = _currentInput;
+
+            // Move the input label to the bottom.
+            _outputContainer.RemoveChild(_inputNode);
+            _outputContainer.AddChild(_inputNode);
 
             // Reset the label.
             _currentInput = String.Empty;
             _inputNode.Text = String.Format(INPUT_FORMAT, _pwdText, _currentInput);
+            _inputNode.GrabFocus();
             _inputNode.CaretColumn = _inputNode.Text.Length;
         }
     }
