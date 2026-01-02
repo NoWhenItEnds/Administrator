@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using Administrator.Managers;
 using Administrator.Utilities;
 using Godot;
@@ -32,7 +34,14 @@ namespace Administrator.UI
         /// <summary> The user's current input. </summary>
         private String _currentInput = String.Empty;
 
+        /// <summary> An object pool holding the terminal's output labels. </summary>
         private ObjectPool<RichTextLabel> _outputPool;
+
+        /// <summary> The index of the currently selected historical input. -1 means that there isn't one. </summary>
+        private Int32 _historyIndex = -1;
+
+        /// <summary> An ordered list of the previous command typed. </summary>
+        private readonly List<String> HISTORY = new List<String>();
 
         /// <summary> The format to render the input text. </summary>
         private const String INPUT_FORMAT = "{0}{1} {2}";
@@ -98,6 +107,11 @@ namespace Administrator.UI
                 commandLabel.Text = submittedText;
 
                 // Now send the command to the computer and record the response.
+                if (HISTORY.Count == 0 || HISTORY.Last() != _currentInput)    // Only add a history if we're not repeating ourselves.
+                {
+                    HISTORY.Add(_currentInput);
+                }
+
                 String response = GameManager.Instance.PlayerComputer.SubmitCommand(_currentInput);
                 RichTextLabel responseLabel = _outputPool.GetAvailableObject();
                 responseLabel.Text = response;
@@ -107,10 +121,32 @@ namespace Administrator.UI
                 _outputContainer.AddChild(_inputNode);
 
                 // Reset the label.
+                _historyIndex = -1;
                 _currentInput = String.Empty;
                 _inputNode.Text = String.Format(INPUT_FORMAT, _pwdText, PWD_SYMBOL, _currentInput);
                 _inputNode.GrabFocus();
                 _inputNode.CaretColumn = _inputNode.Text.Length;
+            }
+        }
+
+
+        /// <inheritdoc/>
+        public override void _Input(InputEvent @event)
+        {
+            if (_inputNode.HasFocus())  // Only allow input if the text input is selected.
+            {
+                if (Input.IsPhysicalKeyPressed(Key.Up) || Input.IsPhysicalKeyPressed(Key.Down))
+                {
+                    GetViewport().SetInputAsHandled();  // Prevent the event from moving the caret.
+                    Int32 direction = (Input.IsPhysicalKeyPressed(Key.Up) ? 1 : 0) - (Input.IsPhysicalKeyPressed(Key.Down) ? 1 : 0);
+                    _historyIndex = Math.Clamp(_historyIndex + direction, -1, HISTORY.Count - 1);
+
+                    // Update the text to the selected history. We count in reverse, taking the length minus the index.
+                    _currentInput = _historyIndex >= 0 ? HISTORY[HISTORY.Count - _historyIndex - 1] : String.Empty;
+                    _inputNode.Text = String.Format(INPUT_FORMAT, _pwdText, PWD_SYMBOL, _currentInput);
+                    _inputNode.GrabFocus();
+                    _inputNode.CaretColumn = _inputNode.Text.Length;
+                }
             }
         }
     }
