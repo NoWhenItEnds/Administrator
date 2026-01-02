@@ -8,7 +8,7 @@ namespace Administrator.Managers
     public partial class GameManager : SingletonNode<GameManager>
     {
         // TODO - Move to player's system?
-        private Computer _playerComputer = new Computer();
+        public Computer PlayerComputer { get; private set; } = new Computer();
 
 
         /// <inheritdoc/>

@@ -1,4 +1,5 @@
 using System;
+using Administrator.Managers;
 using Administrator.Utilities;
 using Godot;
 
@@ -92,8 +93,14 @@ namespace Administrator.UI
         {
             if(!String.IsNullOrWhiteSpace(_currentInput))
             {
-                RichTextLabel newLabel = _outputPool.GetAvailableObject();
-                newLabel.Text = submittedText;
+                // First record the command.
+                RichTextLabel commandLabel = _outputPool.GetAvailableObject();
+                commandLabel.Text = submittedText;
+
+                // Now send the command to the computer and record the response.
+                String response = GameManager.Instance.PlayerComputer.SubmitCommand(_currentInput);
+                RichTextLabel responseLabel = _outputPool.GetAvailableObject();
+                responseLabel.Text = response;
 
                 // Move the input label to the bottom.
                 _outputContainer.RemoveChild(_inputNode);

@@ -1,3 +1,4 @@
+using System;
 using Administrator.Subspace.Components;
 
 namespace Administrator.Subspace
@@ -7,5 +8,11 @@ namespace Administrator.Subspace
     {
         /// <summary> The computer's personal language server. </summary>
         private LanguageServer _languageServer = new LanguageServer();
+
+
+        public String SubmitCommand(String command)
+        {
+            return "TEST";
+        }
     }
 }
