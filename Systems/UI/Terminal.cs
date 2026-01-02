@@ -34,7 +34,10 @@ namespace Administrator.UI
         private ObjectPool<RichTextLabel> _outputPool;
 
         /// <summary> The format to render the input text. </summary>
-        private const String INPUT_FORMAT = "{0} > {1}";
+        private const String INPUT_FORMAT = "{0}{1} {2}";
+
+        /// <summary> The symbol to use for separating the PWD from the input. </summary>
+        private const Char PWD_SYMBOL = '>';
 
 
         /// <inheritdoc/>
@@ -48,13 +51,15 @@ namespace Administrator.UI
             _inputNode.TextSubmitted += OnInputSubmitted;
 
             _outputPool = new ObjectPool<RichTextLabel>(_outputContainer, _outputLabelPrefab, _outputPoolSize);
-            _inputNode.Text = String.Format(INPUT_FORMAT, _pwdText, String.Empty);
+            _inputNode.Text = String.Format(INPUT_FORMAT, _pwdText, PWD_SYMBOL, String.Empty);
         }
 
 
+        /// <summary> Handle the text being changed. </summary>
+        /// <param name="newText"> The input's current text. </param>
         private void OnInputChanged(String newText)
         {
-            String[] input = newText.Split(" > ");
+            String[] input = newText.Split($"{PWD_SYMBOL} ");
 
             if (input.Length > 2)       // Prevent any silly business by collapsing text that is split beyond the initial pwd.
             {
@@ -75,26 +80,31 @@ namespace Administrator.UI
             // Prevent deleting the pwd.
             if (input[0] != _pwdText)
             {
-                _inputNode.Text = String.Format(INPUT_FORMAT, _pwdText, _currentInput);
+                _inputNode.Text = String.Format(INPUT_FORMAT, _pwdText, PWD_SYMBOL, _currentInput);
                 _inputNode.CaretColumn = _inputNode.Text.Length;
             }
         }
 
 
+        /// <summary> Handle the text being submitted. </summary>
+        /// <param name="submittedText"> The full submission text. </param>
         private void OnInputSubmitted(String submittedText)
         {
-            RichTextLabel newLabel = _outputPool.GetAvailableObject();
-            newLabel.Text = _currentInput;
+            if(!String.IsNullOrWhiteSpace(_currentInput))
+            {
+                RichTextLabel newLabel = _outputPool.GetAvailableObject();
+                newLabel.Text = submittedText;
 
-            // Move the input label to the bottom.
-            _outputContainer.RemoveChild(_inputNode);
-            _outputContainer.AddChild(_inputNode);
+                // Move the input label to the bottom.
+                _outputContainer.RemoveChild(_inputNode);
+                _outputContainer.AddChild(_inputNode);
 
-            // Reset the label.
-            _currentInput = String.Empty;
-            _inputNode.Text = String.Format(INPUT_FORMAT, _pwdText, _currentInput);
-            _inputNode.GrabFocus();
-            _inputNode.CaretColumn = _inputNode.Text.Length;
+                // Reset the label.
+                _currentInput = String.Empty;
+                _inputNode.Text = String.Format(INPUT_FORMAT, _pwdText, PWD_SYMBOL, _currentInput);
+                _inputNode.GrabFocus();
+                _inputNode.CaretColumn = _inputNode.Text.Length;
+            }
         }
     }
 }

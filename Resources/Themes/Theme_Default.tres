@@ -1,14 +1,23 @@
-[gd_resource type="Theme" load_steps=5 format=3 uid="uid://qfkw5jdkcnrm"]
+[gd_resource type="Theme" load_steps=8 format=3 uid="uid://qfkw5jdkcnrm"]
 
 [ext_resource type="FontFile" uid="uid://b5ciqjx0lu54n" path="res://Resources/Fonts/Quantico/Quantico-Bold.ttf" id="1_3ws6n"]
 [ext_resource type="FontFile" uid="uid://c6mhm2nuafafd" path="res://Resources/Fonts/Quantico/Quantico-BoldItalic.ttf" id="2_di367"]
 [ext_resource type="FontFile" uid="uid://cuuwojkxigxfj" path="res://Resources/Fonts/Quantico/Quantico-Italic.ttf" id="3_myowx"]
 [ext_resource type="FontFile" uid="uid://byhbf2qg3xbmp" path="res://Resources/Fonts/Quantico/Quantico-Regular.ttf" id="4_shcjg"]
 
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_3ws6n"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_di367"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_myowx"]
+
 [resource]
 default_font = ExtResource("4_shcjg")
 default_font_size = 16
 LineEdit/constants/caret_width = 8
+LineEdit/styles/focus = SubResource("StyleBoxEmpty_3ws6n")
+LineEdit/styles/normal = SubResource("StyleBoxEmpty_di367")
+LineEdit/styles/read_only = SubResource("StyleBoxEmpty_myowx")
 MarginContainer/constants/margin_bottom = 8
 MarginContainer/constants/margin_left = 8
 MarginContainer/constants/margin_right = 8

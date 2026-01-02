@@ -30,6 +30,18 @@ size_flags_horizontal = 3
 size_flags_vertical = 3
 theme = ExtResource("1_v7pud")
 
+[node name="ConsoleOutput" parent="MarginContainer/ScrollContainer/Output Container" instance=ExtResource("3_4rogj")]
+layout_mode = 2
+text = "Windows Powershell"
+
+[node name="ConsoleOutput2" parent="MarginContainer/ScrollContainer/Output Container" instance=ExtResource("3_4rogj")]
+layout_mode = 2
+text = "Copyright (C) Microsoft Corporation. All rights reserved."
+
+[node name="ConsoleOutput3" parent="MarginContainer/ScrollContainer/Output Container" instance=ExtResource("3_4rogj")]
+layout_mode = 2
+text = " "
+
 [node name="Input" type="LineEdit" parent="MarginContainer/ScrollContainer/Output Container"]
 layout_mode = 2
 theme = ExtResource("1_v7pud")
