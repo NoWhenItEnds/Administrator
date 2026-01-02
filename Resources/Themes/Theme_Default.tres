@@ -1,0 +1,20 @@
+[gd_resource type="Theme" load_steps=5 format=3 uid="uid://qfkw5jdkcnrm"]
+
+[ext_resource type="FontFile" uid="uid://b5ciqjx0lu54n" path="res://Resources/Fonts/Quantico/Quantico-Bold.ttf" id="1_3ws6n"]
+[ext_resource type="FontFile" uid="uid://c6mhm2nuafafd" path="res://Resources/Fonts/Quantico/Quantico-BoldItalic.ttf" id="2_di367"]
+[ext_resource type="FontFile" uid="uid://cuuwojkxigxfj" path="res://Resources/Fonts/Quantico/Quantico-Italic.ttf" id="3_myowx"]
+[ext_resource type="FontFile" uid="uid://byhbf2qg3xbmp" path="res://Resources/Fonts/Quantico/Quantico-Regular.ttf" id="4_shcjg"]
+
+[resource]
+default_font = ExtResource("4_shcjg")
+default_font_size = 16
+LineEdit/constants/caret_width = 8
+MarginContainer/constants/margin_bottom = 8
+MarginContainer/constants/margin_left = 8
+MarginContainer/constants/margin_right = 8
+MarginContainer/constants/margin_top = 8
+RichTextLabel/fonts/bold_font = ExtResource("1_3ws6n")
+RichTextLabel/fonts/bold_italics_font = ExtResource("2_di367")
+RichTextLabel/fonts/italics_font = ExtResource("3_myowx")
+RichTextLabel/fonts/mono_font = ExtResource("4_shcjg")
+RichTextLabel/fonts/normal_font = ExtResource("4_shcjg")

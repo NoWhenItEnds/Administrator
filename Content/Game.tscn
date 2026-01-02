@@ -1,6 +1,20 @@
-[gd_scene load_steps=2 format=3 uid="uid://bgdvnsp66wpdb"]
+[gd_scene load_steps=4 format=3 uid="uid://bgdvnsp66wpdb"]
 
 [ext_resource type="Script" uid="uid://cpuax4xmb8s4a" path="res://Systems/Managers/GameManager.cs" id="1_k1v7w"]
+[ext_resource type="Script" uid="uid://dy3vyx05j53sk" path="res://Systems/Managers/UIManager.cs" id="2_33ift"]
+[ext_resource type="PackedScene" uid="uid://k4b1wti4dc1c" path="res://Content/Prefabs/UI/Terminal.tscn" id="3_hls3d"]
 
 [node name="Game" type="Node"]
 script = ExtResource("1_k1v7w")
+
+[node name="UI" type="Control" parent="."]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("2_33ift")
+
+[node name="Terminal" parent="UI" instance=ExtResource("3_hls3d")]
+layout_mode = 1

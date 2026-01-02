@@ -1,0 +1,48 @@
+[gd_scene load_steps=3 format=3 uid="uid://k4b1wti4dc1c"]
+
+[ext_resource type="Script" uid="uid://g6mopr82rll7" path="res://Systems/UI/Terminal.cs" id="1_e38vx"]
+[ext_resource type="Theme" uid="uid://qfkw5jdkcnrm" path="res://Resources/Themes/Theme_Default.tres" id="1_v7pud"]
+
+[node name="Terminal" type="PanelContainer" node_paths=PackedStringArray("_outputContainer", "_inputNode")]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = ExtResource("1_v7pud")
+script = ExtResource("1_e38vx")
+_outputContainer = NodePath("MarginContainer/ScrollContainer/Output Container")
+_inputNode = NodePath("MarginContainer/ScrollContainer/Output Container/Input")
+
+[node name="MarginContainer" type="MarginContainer" parent="."]
+layout_mode = 2
+theme = ExtResource("1_v7pud")
+
+[node name="ScrollContainer" type="ScrollContainer" parent="MarginContainer"]
+layout_mode = 2
+theme = ExtResource("1_v7pud")
+
+[node name="Output Container" type="VBoxContainer" parent="MarginContainer/ScrollContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme = ExtResource("1_v7pud")
+
+[node name="RichTextLabel" type="RichTextLabel" parent="MarginContainer/ScrollContainer/Output Container"]
+layout_mode = 2
+theme = ExtResource("1_v7pud")
+bbcode_enabled = true
+text = "A [b]Line"
+fit_content = true
+vertical_alignment = 1
+
+[node name="RichTextLabel2" type="RichTextLabel" parent="MarginContainer/ScrollContainer/Output Container"]
+layout_mode = 2
+bbcode_enabled = true
+text = "Another line. Another line. Another line. Another line. Another line. Another line. Another line. Another line. Another line. Another line. Another line. Another line. Another line. Another line. Another line. Another line. Another line. Another line. Another line. Another line. Another line. Another line. Another line. Another line. Another line. Another line. Another line. Another line. Another line. Another line. Another line. Another line. Another line. Another line. Another line. Another line. Another line. Another line. Another line. Another line. Another line. Another line. Another line. Another line. Another line. Another line. Another line. Another line. "
+fit_content = true
+
+[node name="Input" type="LineEdit" parent="MarginContainer/ScrollContainer/Output Container"]
+layout_mode = 2
+theme = ExtResource("1_v7pud")
+caret_blink = true
