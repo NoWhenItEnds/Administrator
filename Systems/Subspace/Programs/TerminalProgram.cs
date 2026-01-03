@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Administrator.Utilities.Exceptions;
 
 namespace Administrator.Subspace.Programs
@@ -10,11 +11,8 @@ namespace Administrator.Subspace.Programs
         /// <summary> The command that runs the program. </summary>
         public abstract String Command { get; }
 
-        /// <summary> A map of parameter names and whether they take a value. </summary>
-        public abstract Dictionary<String, Boolean> Parameters { get; } // TODO - Should include description for man.
-
-        /// <summary> An array of how many positional arguments the program expects. Different numbers indicate different configurations and behaviour. </summary>
-        public abstract Int32[] NumberOfPositionalArguments { get; }
+        /// <summary> A map of parameter information. </summary>
+        public abstract HashSet<ParameterInformation> Parameters { get; }
 
         /// <summary> Descriptive text describing the program / command. </summary>
         public abstract String Description { get; }
@@ -34,10 +32,9 @@ namespace Administrator.Subspace.Programs
 
         /// <summary> The logic that is run when executing the program. </summary>
         /// <param name="directoryPath"> The directory the command was given in. </param>
-        /// <param name="parameters"> The named parameter key / value pairs given to the program. </param>
-        /// <param name="positionalArguments"> The positional arguments given to the program. </param>
+        /// <param name="parameters"> The parameter key / value pairs given to the program. </param>
         /// <returns> The result to print to the terminal. </returns>
-        public abstract String ExecuteLogic(String directoryPath, Dictionary<String, String?> parameters, String[] positionalArguments);
+        public abstract String ExecuteLogic(String directoryPath, Dictionary<ParameterInformation, String> parameters);
 
 
         /// <summary> Execute the program. </summary>
@@ -46,59 +43,90 @@ namespace Administrator.Subspace.Programs
         /// <returns> The result to print to the terminal. </returns>
         public String Execute(String directoryPath, String[] arguments)
         {
-            (Dictionary<String, String?> parameters, String[] positionalArguments) result = ParseParameters(arguments);
-            return ExecuteLogic(directoryPath, result.parameters, result.positionalArguments);
+            Dictionary<ParameterInformation, String> parameters = ParseParameters(arguments);
+            return ExecuteLogic(directoryPath, parameters);
         }
 
 
         /// <summary> Validate / filter the arguments input. </summary>
         /// <param name="rawArguments"> The array of raw, unfiltered arguments. </param>
-        /// <returns> A tuple containing a map of the parameter names and their value (if they have one), and an array of the standalone arguments. </returns>
+        /// <returns> A map of the parameter information bound to the value. </returns>
         /// <exception cref="TerminalException"/>
-        private (Dictionary<String, String?> parameters, String[] positionalArguments) ParseParameters(String[] rawArguments)
+        private Dictionary<ParameterInformation, String> ParseParameters(String[] rawArguments)
         {
-            Dictionary<String, String?> parameters = new Dictionary<String, String?>();
-            List<String> standaloneArguments = new List<String>();
+            Dictionary<ParameterInformation, String> boundParameters = new Dictionary<ParameterInformation, String>();
+            Int32 currentPositionalArgument = 0;
 
             for (Int32 i = 0; i < rawArguments.Length; i++)
             {
                 String current = rawArguments[i];
 
-                if (current[0] == '-')                  // If the argument is a name, its a parameter.
+                if (current[0] == '-')                  // If the argument is a name...
                 {
-                    String cleanedParameter = current.Remove(0, 1);    // Remove the '-'.
-
-                    // Check if the parameter exists.
-                    if (!Parameters.ContainsKey(cleanedParameter))
+                    ParameterInformation? boundParameter = null;
+                    if (current[1] == '-')              // If it has "--" then it's the verbose name.
                     {
-                        throw new TerminalException($"Cannot bind unknown parameter '{cleanedParameter}'.");
+                        String cleanedName = current.Remove(0, 2);
+                        boundParameter = Parameters.FirstOrDefault(x => x.FullName == cleanedName) ?? null;
                     }
                     else
                     {
-                        if (Parameters[cleanedParameter])   // Add the parameter and its value.
+                        String cleanedName = current.Remove(0, 1);
+                        boundParameter = Parameters.FirstOrDefault(x => x.ShortName == cleanedName) ?? null;
+                    }
+
+                    // We've found the parameter. Now attempt to bind it.
+                    if (boundParameter != null)
+                    {
+                        if (boundParameter.ExpectsValue)        // Try to provide a value to the parameter if it requires it.
                         {
-                            parameters.Add(cleanedParameter, rawArguments[i + 1]);
-                            i++;
+                            if (i + 1 < rawArguments.Length)   // Check we can provide a value.
+                            {
+                                String argument = rawArguments[i + 1];
+                                if (argument[0] != '-')         // Check we DO provide a value.
+                                {
+                                    boundParameters.Add(boundParameter, argument);
+                                    i++;
+                                }
+                                else
+                                {
+                                    throw new TerminalException($"Cannot bind parameter '{boundParameter.FullName}' to the given value '{argument}'. Expected a value.");
+                                }
+
+                            }
+                            else
+                            {
+                                throw new TerminalException($"Cannot bind parameter '{boundParameter.FullName}'. It expects a value and one wasn't provided.");
+                            }
+
                         }
-                        else                                // Just add the parameter's name.
+                        else
                         {
-                            parameters.Add(cleanedParameter, null);
+                            boundParameters.TryAdd(boundParameter, String.Empty);
                         }
+
+                    }
+                    else
+                    {
+                        throw new TerminalException($"Cannot bind unknown parameter '{current}'.");
                     }
                 }
-                else                                        // Otherwise it's a positional argument.
+                else    // Otherwise it's a positional argument.
                 {
-                    standaloneArguments.Add(current);
+                    ParameterInformation? boundParameter = Parameters.FirstOrDefault(x => x.ShortName == currentPositionalArgument.ToString()) ?? null;
+                    if (boundParameter != null)
+                    {
+                        boundParameters.Add(boundParameter, current);
+                        currentPositionalArgument++;
+                    }
+                    else
+                    {
+                        throw new TerminalException($"The given positional argument at index {currentPositionalArgument} isn't supported by the program.");
+                    }
                 }
             }
 
-            // Check the positional arguments.
-            if (!NumberOfPositionalArguments.Contains(standaloneArguments.Count))
-            {
-                throw new TerminalException($"Incorrect number of positional arguments. Expected ({String.Join(", or ", NumberOfPositionalArguments)}), received {standaloneArguments.Count} ({String.Join(", ", standaloneArguments)}).");
-            }
-
-            return new (parameters, standaloneArguments.ToArray());
+            return boundParameters;
         }
     }
 }

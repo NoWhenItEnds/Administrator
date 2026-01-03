@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Administrator.Utilities.Exceptions;
 
 namespace Administrator.Subspace.Programs
 {
@@ -14,10 +15,10 @@ namespace Administrator.Subspace.Programs
         public override String Description => "Displays a manual of use for the given command.";
 
         /// <inheritdoc/>
-        public override Dictionary<String, Boolean> Parameters => new Dictionary<String, Boolean>();
-
-        /// <inheritdoc/>
-        public override Int32[] NumberOfPositionalArguments => [ 1 ];
+        public override HashSet<ParameterInformation> Parameters => new HashSet<ParameterInformation>()
+        {
+            new ParameterInformation(0, "The command name of the program to display information about.")
+        };
 
 
         /// <summary> Display a manual of use for the given program. </summary>
@@ -26,17 +27,25 @@ namespace Administrator.Subspace.Programs
 
 
         /// <inheritdoc/>
-        public override String ExecuteLogic(String directoryPath, Dictionary<string, string?> parameters, string[] positionalArguments)
+        public override String ExecuteLogic(String directoryPath, Dictionary<ParameterInformation, String> parameters)
         {
-            String response = $"'{positionalArguments[0]}' is not recognised as the name of an operable program, command, or script.";
-
-            TerminalProgram? program = SOURCE.Programs.FirstOrDefault(x => x.Command == positionalArguments[0]) ?? null;
-            if (program != null)
+            String? programName = parameters.FirstOrDefault(x => x.Key.ShortName == "0").Value ?? null;
+            if (programName != null)
             {
-                response = program.Description;
+                TerminalProgram? program = SOURCE.Programs.FirstOrDefault(x => x.Command == programName) ?? null;
+                if (program != null)
+                {
+                    return program.Description;
+                }
+                else
+                {
+                    throw new TerminalException($"'{programName}' is not recognised as the name of an operable program, command, or script.");
+                }
             }
-
-            return response;
+            else
+            {
+                throw new TerminalException($"Expected the name of an operable program, command, or script. Yet one wasn't received.");
+            }
         }
     }
 }

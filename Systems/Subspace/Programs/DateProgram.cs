@@ -13,15 +13,10 @@ namespace Administrator.Subspace.Programs
         public override String Description => "Displays the current system time.";
 
         /// <inheritdoc/>
-        public override Dictionary<String, Boolean> Parameters => new Dictionary<String, Boolean>()
+        public override HashSet<ParameterInformation> Parameters => new HashSet<ParameterInformation>()
         {
-            { "u", false },
-            { "s", false },
-            { "r", true }
+            { new ParameterInformation("utc", "u", "Convert local system time to UTC.", false) }
         };
-
-        /// <inheritdoc/>
-        public override Int32[] NumberOfPositionalArguments => [ 0 ];
 
 
         /// <summary> Gets information about the computer's local time. </summary>
@@ -30,13 +25,18 @@ namespace Administrator.Subspace.Programs
 
 
         /// <inheritdoc/>
-        public override String ExecuteLogic(String directoryPath, Dictionary<String, String?> parameters, String[] positionalArguments)
+        public override String ExecuteLogic(String directoryPath, Dictionary<ParameterInformation, String> parameters)
         {
             DateTime time = DateTime.Now;
 
-            if (parameters.ContainsKey("u"))
+            foreach (KeyValuePair<ParameterInformation, String> parameter in parameters)
             {
-                time = time.ToUniversalTime();
+                switch (parameter.Key.FullName)
+                {
+                    case "utc":
+                        time = time.ToUniversalTime();
+                        break;
+                }
             }
 
             return time.ToString();

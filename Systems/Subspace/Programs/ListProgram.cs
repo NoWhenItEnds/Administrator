@@ -13,10 +13,10 @@ namespace Administrator.Subspace.Programs
         public override String Command => "ls";
 
         /// <inheritdoc/>
-        public override Dictionary<String, Boolean> Parameters => new Dictionary<String, Boolean>();    // TODO - Implement -ls and additional arguments.
-
-        /// <inheritdoc/>
-        public override Int32[] NumberOfPositionalArguments => [ 0, 1 ];
+        public override HashSet<ParameterInformation> Parameters => new HashSet<ParameterInformation>()
+        {
+            new ParameterInformation(0, "The directory path, relative or absolute, to list the file structure for.")
+        };    // TODO - Implement -ls and additional arguments.
 
         /// <inheritdoc/>
         public override String Description => "Lists the sub-directories and files within a directory.";
@@ -28,17 +28,23 @@ namespace Administrator.Subspace.Programs
 
 
         /// <inheritdoc/>
-        public override String ExecuteLogic(String directoryPath, Dictionary<String, String?> parameters, String[] positionalArguments)
+        public override String ExecuteLogic(String directoryPath, Dictionary<ParameterInformation, String> parameters)
         {
             StringBuilder resultDirectories = new StringBuilder();
             StringBuilder resultFiles = new StringBuilder();
 
             // Build the search path.
             String searchPath = directoryPath;
-            if (positionalArguments.Length == 1)                                        // If we specify a filepath, we need to modify the search to include it.
+
+            foreach (KeyValuePair<ParameterInformation, String> parameter in parameters)
             {
-                String argument = positionalArguments[0];
-                searchPath = argument[0] == '/' ? argument : searchPath += argument;    // If we're starting from root, overwrite, else append.
+                switch (parameter.Key.FullName)
+                {
+                    case "0":   // If we specify a filepath, we need to modify the search to include it.
+                        String argument = parameter.Value;
+                        searchPath = argument[0] == '/' ? argument : searchPath += argument;    // If we're starting from root, overwrite, else append.
+                        break;
+                }
             }
 
             // Get the directories.

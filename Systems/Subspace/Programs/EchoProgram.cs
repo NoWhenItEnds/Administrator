@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Administrator.Subspace.Programs
 {
@@ -10,10 +11,10 @@ namespace Administrator.Subspace.Programs
         public override String Command => "echo";
 
         /// <inheritdoc/>
-        public override Dictionary<String, Boolean> Parameters => new Dictionary<String, Boolean>();
-
-        /// <inheritdoc/>
-        public override Int32[] NumberOfPositionalArguments => [ 1 ];
+        public override HashSet<ParameterInformation> Parameters => new HashSet<ParameterInformation>()
+        {
+            new ParameterInformation(0, "The text to print to the terminal.")
+        };
 
         /// <inheritdoc/>
         public override String Description => "Prints the given text to the terminal.";
@@ -25,9 +26,9 @@ namespace Administrator.Subspace.Programs
 
 
         /// <inheritdoc/>
-        public override String ExecuteLogic(String directoryPath, Dictionary<String, String?> parameters, String[] positionalArguments)
+        public override String ExecuteLogic(String directoryPath, Dictionary<ParameterInformation, String> parameters)
         {
-            return positionalArguments[0];
+            return parameters.FirstOrDefault(x => x.Key.ShortName == "0").Value ?? String.Empty;
         }
     }
 }
