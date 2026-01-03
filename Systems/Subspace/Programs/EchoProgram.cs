@@ -13,19 +13,19 @@ namespace Administrator.Subspace.Programs
         public override Dictionary<String, Boolean> Parameters => new Dictionary<String, Boolean>();
 
         /// <inheritdoc/>
-        public override Int32 NumberOfPositionalArguments => 1;
+        public override Int32[] NumberOfPositionalArguments => [ 1 ];
 
         /// <inheritdoc/>
-        public override String Manual => throw new NotImplementedException();
+        public override String Description => "Prints the given text to the terminal.";
 
 
         /// <summary> Prints the given argument to the console. </summary>
         /// <param name="source"> The server / computer the command originates from. </param>
-        public EchoProgram(Computer source) : base(source) { }
+        public EchoProgram(Server source) : base(source) { }
 
 
         /// <inheritdoc/>
-        public override String ExecuteLogic(Dictionary<String, String?> parameters, String[] positionalArguments)
+        public override String ExecuteLogic(String directoryPath, Dictionary<String, String?> parameters, String[] positionalArguments)
         {
             return positionalArguments[0];
         }

@@ -29,7 +29,7 @@ namespace Administrator.UI
 
 
         /// <summary> The user's current working directory. </summary>
-        private String _pwdText = "/home/usr";
+        private String _pwdText = "/home/admin";
 
         /// <summary> The user's current input. </summary>
         private String _currentInput = String.Empty;
@@ -112,7 +112,7 @@ namespace Administrator.UI
                     HISTORY.Add(_currentInput);
                 }
 
-                String response = GameManager.Instance.PlayerComputer.SubmitCommand(_currentInput);
+                String response = GameManager.Instance.PlayerComputer.SubmitCommand(_pwdText, _currentInput);
                 RichTextLabel responseLabel = _outputPool.GetAvailableObject();
                 responseLabel.Text = response;
 

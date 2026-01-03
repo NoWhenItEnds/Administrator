@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
+using Administrator.Subspace.Files;
 using Administrator.Subspace.Programs;
 using Administrator.Utilities.Exceptions;
 using Administrator.Utilities.Extensions;
@@ -9,11 +10,14 @@ using Godot;
 
 namespace Administrator.Subspace
 {
-    /// <summary> A personal computer or server on a network. </summary>
-    public class Computer
+    /// <summary> A server on a network. </summary>
+    public class Server
     {
-        /// <summary> An array of programs available to the computer. </summary>
-        public HashSet<TerminalProgram> Programs { get; private set; }  = new HashSet<TerminalProgram>();
+        /// <summary> The server's filesystem. </summary>
+        public readonly FileSystem Files = new FileSystem(["admin"]);
+
+        /// <summary> An array of programs available to the server. </summary>
+        public readonly HashSet<TerminalProgram> Programs  = new HashSet<TerminalProgram>();
 
         /// <summary>
         /// "[^"]*" : Matches a double quote, followed by any number of non-double quote characters, followed by a double quote.
@@ -22,14 +26,17 @@ namespace Administrator.Subspace
         /// </summary>
         private const String INPUT_PATTERN = @"(""[^""]*""|[^ ]+)";
 
-        public Computer()
+
+        /// <summary> A server on a network. </summary>
+        public Server()
         {
             Programs.Add(new DateProgram(this));
             Programs.Add(new EchoProgram(this));
+            Programs.Add(new ListProgram(this));
             Programs.Add(new ManualProgram(this));
         }
 
-        public String SubmitCommand(String command)
+        public String SubmitCommand(String directoryPath, String command)
         {
             String[] formattedCommand = Regex.Matches(command, INPUT_PATTERN)
                 .Cast<Match>()
@@ -58,7 +65,7 @@ namespace Administrator.Subspace
                     {
                         arguments.Insert(0, result);
                     }
-                    result = DoCommand(section.First(), arguments.ToArray());
+                    result = DoCommand(directoryPath, section.First(), arguments.ToArray());
                 }
             }
             catch (TerminalException exception)
@@ -76,14 +83,14 @@ namespace Administrator.Subspace
         }
 
 
-        private String DoCommand(String command, String[] arguments)
+        private String DoCommand(String directoryPath, String command, String[] arguments)
         {
             String response = $"'{command[0]}' is not recognised as the name of an operable program, command, or script.";
 
             TerminalProgram? program = Programs.FirstOrDefault(x => x.Command == command) ?? null;
             if (program != null)
             {
-                response = program.Execute(arguments);
+                response = program.Execute(directoryPath, arguments);
             }
 
             return response;

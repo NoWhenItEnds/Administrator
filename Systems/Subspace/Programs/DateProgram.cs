@@ -10,7 +10,7 @@ namespace Administrator.Subspace.Programs
         public override String Command => "date";
 
         /// <inheritdoc/>
-        public override String Manual => throw new NotImplementedException();
+        public override String Description => "Displays the current system time.";
 
         /// <inheritdoc/>
         public override Dictionary<String, Boolean> Parameters => new Dictionary<String, Boolean>()
@@ -21,16 +21,16 @@ namespace Administrator.Subspace.Programs
         };
 
         /// <inheritdoc/>
-        public override Int32 NumberOfPositionalArguments => 0;
+        public override Int32[] NumberOfPositionalArguments => [ 0 ];
 
 
         /// <summary> Gets information about the computer's local time. </summary>
         /// <param name="source"> The server / computer the command originates from. </param>
-        public DateProgram(Computer source) : base(source) { }
+        public DateProgram(Server source) : base(source) { }
 
 
         /// <inheritdoc/>
-        public override String ExecuteLogic(Dictionary<String, String?> parameters, String[] positionalArguments)
+        public override String ExecuteLogic(String directoryPath, Dictionary<String, String?> parameters, String[] positionalArguments)
         {
             DateTime time = DateTime.Now;
 

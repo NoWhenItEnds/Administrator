@@ -13,39 +13,41 @@ namespace Administrator.Subspace.Programs
         /// <summary> A map of parameter names and whether they take a value. </summary>
         public abstract Dictionary<String, Boolean> Parameters { get; } // TODO - Should include description for man.
 
-        /// <summary> How many positional arguments the program expects. </summary>
-        public abstract Int32 NumberOfPositionalArguments { get; }
+        /// <summary> An array of how many positional arguments the program expects. Different numbers indicate different configurations and behaviour. </summary>
+        public abstract Int32[] NumberOfPositionalArguments { get; }
 
         /// <summary> Descriptive text describing the program / command. </summary>
-        public abstract String Manual { get; }
+        public abstract String Description { get; }
 
 
         /// <summary> The server / computer the program originates from. </summary>
-        protected readonly Computer SOURCE;
+        protected readonly Server SOURCE;
 
 
         /// <summary> A program that can be run via the terminal. </summary>
         /// <param name="source"> The server / computer the program originates from. </param>
-        public TerminalProgram(Computer source)
+        public TerminalProgram(Server source)
         {
             SOURCE = source;
         }
 
 
         /// <summary> The logic that is run when executing the program. </summary>
+        /// <param name="directoryPath"> The directory the command was given in. </param>
         /// <param name="parameters"> The named parameter key / value pairs given to the program. </param>
         /// <param name="positionalArguments"> The positional arguments given to the program. </param>
         /// <returns> The result to print to the terminal. </returns>
-        public abstract String ExecuteLogic(Dictionary<String, String?> parameters, String[] positionalArguments);
+        public abstract String ExecuteLogic(String directoryPath, Dictionary<String, String?> parameters, String[] positionalArguments);
 
 
         /// <summary> Execute the program. </summary>
+        /// <param name="directoryPath"> The directory the command was given in. </param>
         /// <param name="arguments"> The arguments given to the program. </param>
         /// <returns> The result to print to the terminal. </returns>
-        public String Execute(String[] arguments)
+        public String Execute(String directoryPath, String[] arguments)
         {
             (Dictionary<String, String?> parameters, String[] positionalArguments) result = ParseParameters(arguments);
-            return ExecuteLogic(result.parameters, result.positionalArguments);
+            return ExecuteLogic(directoryPath, result.parameters, result.positionalArguments);
         }
 
 
@@ -91,9 +93,9 @@ namespace Administrator.Subspace.Programs
             }
 
             // Check the positional arguments.
-            if (standaloneArguments.Count != NumberOfPositionalArguments)
+            if (!NumberOfPositionalArguments.Contains(standaloneArguments.Count))
             {
-                throw new TerminalException($"Incorrect number of positional arguments. Expected '{NumberOfPositionalArguments}', received '{standaloneArguments.Count}' ({String.Join(',', standaloneArguments)}).");
+                throw new TerminalException($"Incorrect number of positional arguments. Expected ({String.Join(", or ", NumberOfPositionalArguments)}), received {standaloneArguments.Count} ({String.Join(", ", standaloneArguments)}).");
             }
 
             return new (parameters, standaloneArguments.ToArray());
