@@ -85,7 +85,7 @@ namespace Administrator.Subspace
 
         private String DoCommand(String directoryPath, String command, String[] arguments)
         {
-            String response = $"'{command[0]}' is not recognised as the name of an operable program, command, or script.";
+            String response = $"'{command}' is not recognised as the name of an operable program, command, or script.";
 
             TerminalProgram? program = Programs.FirstOrDefault(x => x.Command == command) ?? null;
             if (program != null)

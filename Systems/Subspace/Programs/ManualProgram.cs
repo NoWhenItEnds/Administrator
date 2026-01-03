@@ -1,7 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using Administrator.Utilities.Exceptions;
+using Administrator.Utilities.Extensions;
 
 namespace Administrator.Subspace.Programs
 {
@@ -21,6 +23,13 @@ namespace Administrator.Subspace.Programs
         };
 
 
+        /// <summary> The format to use for displaying information about named parameters. </summary>
+        private const String NAMED_PARAMETER_FORMAT = "[b]--{0} -{1}[/b] : {2}";
+
+        /// <summary> The format to use for displaying information about positional parameters. </summary>
+        private const String POSITIONAL_PARAMETER_FORMAT = "[b][{0}][/b] : {1}";
+
+
         /// <summary> Display a manual of use for the given program. </summary>
         /// <param name="source"> The server / computer the command originates from. </param>
         public ManualProgram(Server source) : base(source) { }
@@ -35,7 +44,21 @@ namespace Administrator.Subspace.Programs
                 TerminalProgram? program = SOURCE.Programs.FirstOrDefault(x => x.Command == programName) ?? null;
                 if (program != null)
                 {
-                    return program.Description;
+                    StringBuilder result = new StringBuilder();
+                    result.AppendLine(program.Description);
+                    foreach (ParameterInformation parameter in program.Parameters)
+                    {
+                        if (parameter.FullName.IsNumericOnly())
+                        {
+                            result.AppendLine(String.Format(POSITIONAL_PARAMETER_FORMAT, parameter.FullName, parameter.Description));
+                        }
+                        else
+                        {
+                            result.AppendLine(String.Format(NAMED_PARAMETER_FORMAT, parameter.FullName, parameter.ShortName, parameter.Description));
+                        }
+                    }
+
+                    return result.ToString();
                 }
                 else
                 {
