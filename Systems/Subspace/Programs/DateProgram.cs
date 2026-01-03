@@ -4,7 +4,7 @@ using System.Collections.Generic;
 namespace Administrator.Subspace.Programs
 {
     /// <summary> Gets information about the computer's local time. </summary>
-    public class TimeProgram : TerminalProgram
+    public class DateProgram : TerminalProgram
     {
         /// <inheritdoc/>
         public override String Command => "date";
@@ -26,13 +26,20 @@ namespace Administrator.Subspace.Programs
 
         /// <summary> Gets information about the computer's local time. </summary>
         /// <param name="source"> The server / computer the command originates from. </param>
-        public TimeProgram(Computer source) : base(source) { }
+        public DateProgram(Computer source) : base(source) { }
 
 
         /// <inheritdoc/>
-        public override String ExecuteLogic(Dictionary<string, string?> parameters, string[] positionalArguments)
+        public override String ExecuteLogic(Dictionary<String, String?> parameters, String[] positionalArguments)
         {
-            throw new NotImplementedException();
+            DateTime time = DateTime.Now;
+
+            if (parameters.ContainsKey("u"))
+            {
+                time = time.ToUniversalTime();
+            }
+
+            return time.ToString();
         }
     }
 }

@@ -24,6 +24,8 @@ namespace Administrator.Subspace
 
         public Computer()
         {
+            Programs.Add(new DateProgram(this));
+            Programs.Add(new EchoProgram(this));
             Programs.Add(new ManualProgram(this));
         }
 
@@ -35,6 +37,7 @@ namespace Administrator.Subspace
                 .ToArray();
 
             // Split the command into file-based sections.
+            // TODO - Implement file piping. And fix this shit.
             IEnumerable<String>[] fileSplit = formattedCommand.SplitArray(">>").ToArray();
             if (fileSplit.Count() == 1)
             {

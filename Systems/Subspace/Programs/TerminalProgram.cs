@@ -11,7 +11,7 @@ namespace Administrator.Subspace.Programs
         public abstract String Command { get; }
 
         /// <summary> A map of parameter names and whether they take a value. </summary>
-        public abstract Dictionary<String, Boolean> Parameters { get; }
+        public abstract Dictionary<String, Boolean> Parameters { get; } // TODO - Should include description for man.
 
         /// <summary> How many positional arguments the program expects. </summary>
         public abstract Int32 NumberOfPositionalArguments { get; }
