@@ -1,7 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 using Administrator.Subspace.Programs;
+using Administrator.Utilities.Exceptions;
+using Administrator.Utilities.Extensions;
 using Godot;
 
 namespace Administrator.Subspace
@@ -12,6 +15,12 @@ namespace Administrator.Subspace
         /// <summary> An array of programs available to the computer. </summary>
         public HashSet<TerminalProgram> Programs { get; private set; }  = new HashSet<TerminalProgram>();
 
+        /// <summary>
+        /// "[^"]*" : Matches a double quote, followed by any number of non-double quote characters, followed by a double quote.
+        /// | : OR
+        /// [^ ]+ : Matches one or more characters that are NOT a space.
+        /// </summary>
+        private const String INPUT_PATTERN = @"(""[^""]*""|[^ ]+)";
 
         public Computer()
         {
@@ -20,46 +29,58 @@ namespace Administrator.Subspace
 
         public String SubmitCommand(String command)
         {
-            // Handle operation order. File -> Pipe -> Command.
-            String[] fileSplit = command.Split(">>", StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
-            if (fileSplit.Length == 1)  // If there isn't append, try overwrite.
+            String[] formattedCommand = Regex.Matches(command, INPUT_PATTERN)
+                .Cast<Match>()
+                .Select(m => m.Value.Trim('"'))
+                .ToArray();
+
+            // Split the command into file-based sections.
+            IEnumerable<String>[] fileSplit = formattedCommand.SplitArray(">>").ToArray();
+            if (fileSplit.Count() == 1)
             {
-                fileSplit = command.Split('>', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
+                fileSplit = formattedCommand.SplitArray(">").ToArray();
             }
 
-            // Check that we don't have too many commands.
-            if (fileSplit.Length > 2)
-            {
-                return "The output for this command is already being redirected.";
-            }
+            // There will always be a initial part even if the result won't be piped into a file.
+            IEnumerable<String>[] pipeSplit = fileSplit[0].SplitArray("|").ToArray();
 
-            String[] pipeSplit = fileSplit[0].Split('|', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
-            String previousResult = String.Empty;
-            foreach (String current in pipeSplit)
+            String result = String.Empty;
+            try
             {
-                String[] commandSplit = command.Split(' ', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
-                if (!String.IsNullOrWhiteSpace(previousResult))
+                foreach (IEnumerable<String> section in pipeSplit)
                 {
-                    List<String> modifiedCommand = new List<String>(commandSplit);
-                    modifiedCommand.Insert(1, previousResult);  // Insert the piped value as the first argument.
-                    commandSplit = modifiedCommand.ToArray();
+                    String[] sectionArray = section.ToArray();
+                    List<String> arguments = new List<String>(sectionArray[1..]);
+                    if (!String.IsNullOrWhiteSpace(result))
+                    {
+                        arguments.Insert(0, result);
+                    }
+                    result = DoCommand(section.First(), arguments.ToArray());
                 }
-
-                previousResult = DoCommand(commandSplit);
+            }
+            catch (TerminalException exception)
+            {
+                return exception.Message;
             }
 
-            return previousResult;
+
+            if (fileSplit.Count() > 1)  // If there's a file component to pipe the result into.
+            {
+
+            }
+
+            return result;
         }
 
 
-        private String DoCommand(String[] command)
+        private String DoCommand(String command, String[] arguments)
         {
             String response = $"'{command[0]}' is not recognised as the name of an operable program, command, or script.";
 
-            TerminalProgram? program = Programs.FirstOrDefault(x => x.Command == command[0]) ?? null;
+            TerminalProgram? program = Programs.FirstOrDefault(x => x.Command == command) ?? null;
             if (program != null)
             {
-                response = program.Execute(command[1..]);
+                response = program.Execute(arguments);
             }
 
             return response;
