@@ -45,10 +45,7 @@ namespace Administrator.Subspace.Programs
 
 
         /// <inheritdoc/>
-        public override Int32 GetHashCode()
-        {
-            return HashCode.Combine(FullName, ShortName);
-        }
+        public override Int32 GetHashCode() => HashCode.Combine(FullName, ShortName);
 
 
         /// <inheritdoc/>

@@ -48,7 +48,7 @@ namespace Administrator.Subspace.Programs
             }
 
             // Get the directories.
-            Dictionary<String, File[]> directories = SOURCE.Files.ListDirectory(searchPath);
+            Dictionary<String, File[]> directories = SOURCE.Files.ListDirectories(searchPath);
 
             // Build the strings for directories and files.
             foreach (KeyValuePair<String, File[]> directory in directories)
