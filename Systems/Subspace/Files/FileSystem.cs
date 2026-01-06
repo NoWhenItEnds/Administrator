@@ -11,6 +11,9 @@ namespace Administrator.Subspace.Files
         /// <summary> The filesystem's directory data structure, mapping the directory path to the files within it. </summary>
         private Dictionary<String, HashSet<File>> _directories = new Dictionary<String, HashSet<File>>();
 
+
+        /// <summary> A server's filesystem. </summary>
+        /// <param name="users"> A list of the system's initial usernames. </param>
         public FileSystem(String[] users)
         {
             CreateDirectory($"/etc", true);
@@ -25,22 +28,22 @@ namespace Administrator.Subspace.Files
         /// <summary> Create a new directory at the given path. </summary>
         /// <param name="directoryPath"> The absolute directory path. Will recursively create directories. </param>
         /// <param name="isRecursive"> Whether directories should be created recursively if they don't already exist. </param>
-        public void CreateDirectory(String directoryPath, Boolean isRecursive)
+        public void CreateDirectory(String directoryPath, Boolean isRecursive = false)
         {
-            String[] directories = directoryPath.Split('/', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
+            ParseFilepath(directoryPath, out String[] files, out String cleanedPath);
 
             if (isRecursive)    // If directories should be recursively created.
             {
                 String currentDirectory = String.Empty;
-                for (Int32 i = 0; i < directories.Length; i++)
+                for (Int32 i = 0; i < files.Length; i++)
                 {
-                    currentDirectory += $"/{directories[i]}";
+                    currentDirectory += $"/{files[i]}";
                     _directories.TryAdd(currentDirectory, new HashSet<File>());
                 }
             }
             else
             {
-                String parentDirectory = $"/{String.Join('/', directories[..^1])}";
+                String parentDirectory = $"/{String.Join('/', files[..^1])}";
                 if (_directories.Keys.Contains(parentDirectory))    // Check to see if the parent directory already exists.
                 {
                     _directories.TryAdd(directoryPath, new HashSet<File>());
@@ -52,7 +55,15 @@ namespace Administrator.Subspace.Files
             }
         }
 
-        public Dictionary<String, File[]> ListDirectories(String directoryPath) => _directories.Where(x => x.Key.StartsWith(directoryPath)).ToDictionary(d => d.Key, d => d.Value.ToArray());
+
+        /// <summary> Get all the directory and all sub-directories associated with the given directory path. </summary>
+        /// <param name="directoryPath"> The directory path. </param>
+        /// <returns> A subset of the filesystem with only the sub-directories associated with the given directory path. </returns>
+        public Dictionary<String, File[]> ListDirectories(String directoryPath)
+        {
+            // TODO - Show only contents if ends with '*'
+            return _directories.Where(x => x.Key.StartsWith(directoryPath)).ToDictionary(d => d.Key, d => d.Value.ToArray());
+        }
 
 
         /// <summary> Create a new file at the given path. </summary>
@@ -60,9 +71,10 @@ namespace Administrator.Subspace.Files
         /// <param name="isRecursive"> Whether directories should be created recursively if they don't already exist. </param>
         public void CreateFile(String filePath, Boolean isRecursive = false)
         {
-            String[] names = filePath.Split('/', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
-            String[] directories = names[..^1];
-            String filename = names[^1];
+            ParseFilepath(filePath, out String[] files, out String cleanedPath);
+
+            String[] directories = files[..^1];
+            String filename = files[^1];
 
             File newFile = new File(filename, DateTime.UtcNow); // TODO - Pull for server time.
 
@@ -76,23 +88,22 @@ namespace Administrator.Subspace.Files
         }
 
 
+        /// <summary> Remove a file or directory from the filesystem. </summary>
+        /// <param name="filePath"> The filepath of the file to remove. </param>
+        /// <param name="isRecursive"> Whether the element should be removed recursively. </param>
+        /// <exception cref="TerminalException"/>
         public void RemoveFile(String filePath, Boolean isRecursive = false)
         {
-            // Clean the filepath by removing any trailing delineates.
-            String cleanedPath = filePath.TrimEnd('/');
-            if (String.IsNullOrWhiteSpace(cleanedPath)) // If the result is empty, we were trying to remove root.
-            {
-                throw new TerminalException($"Unable to remove 'root' from the filesystem.");
-            }
+            ParseFilepath(filePath, out String[] files, out String cleanedPath);
+            // TODO - Delete only contents if ends with '*'
 
-            String[] names = cleanedPath.Split('/', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
-            String[] directories = names[..^1];
-            String filename = names[^1];
+            String[] directories = files[..^1];
+            String filename = files[^1];
             String parentDirectory = '/' + String.Join('/', directories);
 
             if (String.IsNullOrWhiteSpace(System.IO.Path.GetExtension(filename)))   // Check if the filepath is actually a directory. If so, the extension method will return an empty string.
             {
-                KeyValuePair<String, HashSet<File>>[] relevantDirectories = _directories.Where(x => x.Key.StartsWith(filePath)).OrderByDescending(x => x.Key.Length).ToArray();
+                KeyValuePair<String, HashSet<File>>[] relevantDirectories = _directories.Where(x => x.Key.StartsWith(cleanedPath)).OrderByDescending(x => x.Key.Length).ToArray();
                 if (relevantDirectories.Length == 0)
                 {
                     throw new TerminalException($"The directory does not exist within the filesystem.");
@@ -121,6 +132,24 @@ namespace Administrator.Subspace.Files
             {
                 _directories[parentDirectory].RemoveWhere(x => x.Name == filename);
             }
+        }
+
+
+        /// <summary> Separate a filepath into its directory components. </summary>
+        /// <param name="filePath"> The raw string. </param>
+        /// <param name="files"> The file components as an array. </param>
+        /// <param name="cleanedPath"> The original path without any trailing delineator. </param>
+        /// <exception cref="TerminalException"/>
+        private void ParseFilepath(String filePath, out String[] files, out String cleanedPath)
+        {
+            // Clean the filepath by removing any trailing delineates.
+            cleanedPath = filePath.TrimEnd('/');
+            if (String.IsNullOrWhiteSpace(cleanedPath)) // If the result is empty, we were trying to remove root.
+            {
+                throw new TerminalException($"Unable to target 'root' within the filesystem.");
+            }
+
+            files = cleanedPath.Split('/', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
         }
     }
 }
