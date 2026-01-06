@@ -17,30 +17,37 @@ namespace Administrator.Subspace.Programs
         /// <summary> Whether the parameter expects a value to be bound to it, or whether it acts as a flag. </summary>
         public Boolean ExpectsValue { get; init; }
 
+        /// <summary> Whether the parameter is required for the command. </summary>
+        public Boolean IsRequired { get; init; }
+
 
         /// <summary> Information that helps define a program's parameter. </summary>
         /// <param name="fullName"> The parameter's verbose name. </param>
         /// <param name="shortName"> The parameter's shortened name. </param>
         /// <param name="description"> A description about the parameter's use. </param>
         /// <param name="expectsValue"> Whether the parameter expects a value to be bound to it, or whether it acts as a flag. </param>
-        public ParameterInformation(String fullName, String shortName, String description, Boolean expectsValue)
+        /// <param name="isRequired"> Whether the parameter is required for the command. </param>
+        public ParameterInformation(String fullName, String shortName, String description, Boolean expectsValue, Boolean isRequired = false)
         {
             FullName = fullName;
             ShortName = shortName;
             Description = description;
             ExpectsValue = expectsValue;
+            IsRequired = isRequired;
         }
 
 
         /// <summary> Information that helps define a program's parameter. </summary>
         /// <param name="position"> The position for the positional parameter. </param>
         /// <param name="description"> A description about the parameter's use. </param>
-        public ParameterInformation(Int32 position, String description)
+        /// <param name="isRequired"> Whether the parameter is required for the command. </param>
+        public ParameterInformation(Int32 position, String description, Boolean isRequired = false)
         {
             FullName = position.ToString();
             ShortName = position.ToString();
             Description = description;
             ExpectsValue = true;
+            IsRequired = isRequired;
         }
 
 

@@ -19,7 +19,7 @@ namespace Administrator.Subspace.Programs
         /// <inheritdoc/>
         public override HashSet<ParameterInformation> Parameters => new HashSet<ParameterInformation>()
         {
-            new ParameterInformation(0, "The command name of the program to display information about.")
+            new ParameterInformation(0, "The command name of the program to display information about.", true)
         };
 
 
@@ -38,36 +38,29 @@ namespace Administrator.Subspace.Programs
         /// <inheritdoc/>
         public override String ExecuteLogic(String directoryPath, Dictionary<ParameterInformation, String> parameters)
         {
-            String? programName = parameters.FirstOrDefault(x => x.Key.ShortName == "0").Value ?? null;
-            if (programName != null)
+            String programName = parameters.First(x => x.Key.ShortName == "0").Value;
+            TerminalProgram? program = SOURCE.Programs.FirstOrDefault(x => x.Command == programName) ?? null;
+            if (program != null)
             {
-                TerminalProgram? program = SOURCE.Programs.FirstOrDefault(x => x.Command == programName) ?? null;
-                if (program != null)
+                StringBuilder result = new StringBuilder();
+                result.AppendLine(program.Description);
+                foreach (ParameterInformation parameter in program.Parameters)
                 {
-                    StringBuilder result = new StringBuilder();
-                    result.AppendLine(program.Description);
-                    foreach (ParameterInformation parameter in program.Parameters)
+                    if (parameter.FullName.IsNumericOnly())
                     {
-                        if (parameter.FullName.IsNumericOnly())
-                        {
-                            result.AppendLine(String.Format(POSITIONAL_PARAMETER_FORMAT, parameter.FullName, parameter.Description));
-                        }
-                        else
-                        {
-                            result.AppendLine(String.Format(NAMED_PARAMETER_FORMAT, parameter.FullName, parameter.ShortName, parameter.Description));
-                        }
+                        result.AppendLine(String.Format(POSITIONAL_PARAMETER_FORMAT, parameter.FullName, parameter.Description));
                     }
+                    else
+                    {
+                        result.AppendLine(String.Format(NAMED_PARAMETER_FORMAT, parameter.FullName, parameter.ShortName, parameter.Description));
+                    }
+                }
 
-                    return result.ToString();
-                }
-                else
-                {
-                    throw new TerminalException($"'{programName}' is not recognised as the name of an operable program, command, or script.");
-                }
+                return result.ToString();
             }
             else
             {
-                throw new TerminalException($"Expected the name of an operable program, command, or script. Yet one wasn't received.");
+                throw new TerminalException($"'{programName}' is not recognised as the name of an operable program, command, or script.");
             }
         }
     }

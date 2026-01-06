@@ -13,7 +13,7 @@ namespace Administrator.Subspace.Programs
         /// <inheritdoc/>
         public override HashSet<ParameterInformation> Parameters => new HashSet<ParameterInformation>()
         {
-            new ParameterInformation(0, "The text to print to the terminal.")
+            new ParameterInformation(0, "The text to print to the terminal.", true)
         };
 
         /// <inheritdoc/>
@@ -28,7 +28,7 @@ namespace Administrator.Subspace.Programs
         /// <inheritdoc/>
         public override String ExecuteLogic(String directoryPath, Dictionary<ParameterInformation, String> parameters)
         {
-            return parameters.FirstOrDefault(x => x.Key.ShortName == "0").Value ?? String.Empty;
+            return parameters.First(x => x.Key.ShortName == "0").Value;
         }
     }
 }

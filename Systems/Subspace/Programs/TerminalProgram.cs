@@ -44,6 +44,7 @@ namespace Administrator.Subspace.Programs
         public String Execute(String directoryPath, String[] arguments)
         {
             Dictionary<ParameterInformation, String> parameters = ParseParameters(arguments);
+            ValidateParameters(parameters.Keys.ToArray());
             return ExecuteLogic(directoryPath, parameters);
         }
 
@@ -127,6 +128,20 @@ namespace Administrator.Subspace.Programs
             }
 
             return boundParameters;
+        }
+
+
+        /// <summary> A guard clause to ensure that the program was given all the necessary parameters. </summary>
+        /// <param name="parameters"></param>
+        private void ValidateParameters(ParameterInformation[] parameters)
+        {
+            foreach (ParameterInformation parameter in Parameters)
+            {
+                if (parameter.IsRequired && !parameters.Contains(parameter))
+                {
+                    throw new TerminalException($"Parameter '{parameter.FullName}' is required yet wasn't provided.");
+                }
+            }
         }
     }
 }

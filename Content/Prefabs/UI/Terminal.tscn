@@ -4,7 +4,7 @@
 [ext_resource type="Theme" uid="uid://qfkw5jdkcnrm" path="res://Resources/Themes/Theme_Default.tres" id="1_v7pud"]
 [ext_resource type="PackedScene" uid="uid://cy5t03qh6tfhb" path="res://Content/Prefabs/UI/Components/ConsoleOutput.tscn" id="3_4rogj"]
 
-[node name="Terminal" type="PanelContainer" node_paths=PackedStringArray("_outputContainer", "_inputNode")]
+[node name="Terminal" type="PanelContainer" node_paths=PackedStringArray("_outputContainer", "_scrollContainer", "_inputNode")]
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
@@ -13,6 +13,7 @@ grow_vertical = 2
 theme = ExtResource("1_v7pud")
 script = ExtResource("1_e38vx")
 _outputContainer = NodePath("MarginContainer/ScrollContainer/Output Container")
+_scrollContainer = NodePath("MarginContainer/ScrollContainer")
 _inputNode = NodePath("MarginContainer/ScrollContainer/Output Container/Input")
 _outputLabelPrefab = ExtResource("3_4rogj")
 

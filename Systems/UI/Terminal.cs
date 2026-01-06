@@ -14,6 +14,9 @@ namespace Administrator.UI
         [ExportGroup("Nodes")]
         [Export] private VBoxContainer _outputContainer;
 
+        /// <summary> The scrollable container that holds the terminal controls. </summary>
+        [Export] private ScrollContainer _scrollContainer;
+
         /// <summary> The input field the user uses to type commands to the terminal. </summary>
         [Export] private LineEdit _inputNode;
 
@@ -113,8 +116,11 @@ namespace Administrator.UI
                 }
 
                 String response = GameManager.Instance.PlayerComputer.SubmitCommand(_pwdText, _currentInput);
-                RichTextLabel responseLabel = _outputPool.GetAvailableObject();
-                responseLabel.Text = response;
+                if (!String.IsNullOrWhiteSpace(response))   // Don't print a empty response.
+                {
+                    RichTextLabel responseLabel = _outputPool.GetAvailableObject();
+                    responseLabel.Text = response;
+                }
 
                 // Move the input label to the bottom.
                 _outputContainer.RemoveChild(_inputNode);
@@ -126,6 +132,18 @@ namespace Administrator.UI
                 _inputNode.Text = String.Format(INPUT_FORMAT, _pwdText, PWD_SYMBOL, _currentInput);
                 _inputNode.GrabFocus();
                 _inputNode.CaretColumn = _inputNode.Text.Length;
+                CallDeferred("ScrollToBottom"); // TODO - Not entirely working.
+            }
+        }
+
+
+        /// <summary> Scroll the terminal to the bottom to follow the input. </summary>
+        private void ScrollToBottom()
+        {
+            VScrollBar? scrollBar = _scrollContainer.GetVScrollBar();
+            if (scrollBar != null)
+            {
+                scrollBar.Value = scrollBar.MaxValue;
             }
         }
 

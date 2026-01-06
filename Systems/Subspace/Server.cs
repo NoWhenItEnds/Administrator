@@ -30,10 +30,12 @@ namespace Administrator.Subspace
         /// <summary> A server on a network. </summary>
         public Server()
         {
+            Programs.Add(new CreateDirectoryProgram(this));
             Programs.Add(new DateProgram(this));
             Programs.Add(new EchoProgram(this));
             Programs.Add(new ListProgram(this));
             Programs.Add(new ManualProgram(this));
+            Programs.Add(new RemoveFileProgram(this));
         }
 
         public String SubmitCommand(String directoryPath, String command)
