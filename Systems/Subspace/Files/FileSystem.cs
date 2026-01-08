@@ -61,8 +61,17 @@ namespace Administrator.Subspace.Files
         /// <returns> A subset of the filesystem with only the sub-directories associated with the given directory path. </returns>
         public Dictionary<String, File[]> ListDirectories(String directoryPath)
         {
-            // TODO - Show only contents if ends with '*'
-            return _directories.Where(x => x.Key.StartsWith(directoryPath)).ToDictionary(d => d.Key, d => d.Value.ToArray());
+            Boolean isWildcard = directoryPath[^1] == '*';
+            String cleanedPath = directoryPath.TrimEnd(['/', '*']);
+
+            // TODO - Finish and use in other methods where searching! DO WE EVEN NEED PARSER?
+            Dictionary<String, File[]> subset = _directories.Where(x => x.Key.StartsWith(cleanedPath)).ToDictionary(d => d.Key, d => d.Value.ToArray());
+            if (isWildcard) // If we use a wildcard, we only want the sub-directories, not the parent.
+            {
+                subset.Remove(cleanedPath);
+            }
+
+            return subset;
         }
 
 
@@ -94,6 +103,8 @@ namespace Administrator.Subspace.Files
         /// <exception cref="TerminalException"/>
         public void RemoveFile(String filePath, Boolean isRecursive = false)
         {
+            //Dictionary<String, File[]> relevantDirectories1 = ListDirectories(filePath);
+
             ParseFilepath(filePath, out String[] files, out String cleanedPath);
             // TODO - Delete only contents if ends with '*'
 
@@ -103,22 +114,22 @@ namespace Administrator.Subspace.Files
 
             if (String.IsNullOrWhiteSpace(System.IO.Path.GetExtension(filename)))   // Check if the filepath is actually a directory. If so, the extension method will return an empty string.
             {
-                KeyValuePair<String, HashSet<File>>[] relevantDirectories = _directories.Where(x => x.Key.StartsWith(cleanedPath)).OrderByDescending(x => x.Key.Length).ToArray();
-                if (relevantDirectories.Length == 0)
+                Dictionary<String, File[]> relevantDirectories = ListDirectories(cleanedPath);
+                if (relevantDirectories.Count == 0)
                 {
                     throw new TerminalException($"The directory does not exist within the filesystem.");
                 }
 
                 if (isRecursive)    // If recursive, we're deleting everything.
                 {
-                    foreach (KeyValuePair<String, HashSet<File>> directory in relevantDirectories)
+                    foreach (KeyValuePair<String, File[]> directory in relevantDirectories)
                     {
                         _directories.Remove(directory.Key);
                     }
                 }
                 else                // Else, we want to check there's nothing there first.
                 {
-                    if (relevantDirectories.Length == 1 && _directories[cleanedPath].Count() == 0)  // There should be no sub-directories, and no files.
+                    if (relevantDirectories.Count == 1 && _directories[cleanedPath].Count() == 0)  // There should be no sub-directories, and no files.
                     {
                         _directories.Remove(cleanedPath);
                     }
