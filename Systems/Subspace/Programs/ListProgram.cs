@@ -48,7 +48,7 @@ namespace Administrator.Subspace.Programs
             }
 
             // Get the directories.
-            Dictionary<String, File[]> directories = SOURCE.Files.ListDirectories(searchPath);
+            IOrderedEnumerable<KeyValuePair<String, File[]>> directories = SOURCE.Files.ListDirectories(searchPath).OrderBy(x => x.Key);
 
             // Build the strings for directories and files.
             foreach (KeyValuePair<String, File[]> directory in directories)

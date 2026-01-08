@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using System.Text.RegularExpressions;
 
 namespace Administrator.Utilities.Extensions
 {
@@ -19,7 +20,7 @@ namespace Administrator.Utilities.Extensions
         /// <summary> Returns whether the input only contains digits and letters (no special characters). </summary>
         public static Boolean IsAlphaNumeric(this String input)
         {
-            return input.All(Char.IsLetterOrDigit);
+            return Regex.IsMatch(input, @"^\w+$");  // All characters and letters + underscore.
         }
 
 

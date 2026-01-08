@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Administrator.Utilities.Exceptions;
+using Administrator.Utilities.Extensions;
 
 namespace Administrator.Subspace.Files
 {
@@ -64,7 +65,6 @@ namespace Administrator.Subspace.Files
             Boolean isWildcard = directoryPath[^1] == '*';
             String cleanedPath = directoryPath.TrimEnd(['/', '*']);
 
-            // TODO - Finish and use in other methods where searching! DO WE EVEN NEED PARSER?
             Dictionary<String, File[]> subset = _directories.Where(x => x.Key.StartsWith(cleanedPath)).ToDictionary(d => d.Key, d => d.Value.ToArray());
             if (isWildcard) // If we use a wildcard, we only want the sub-directories, not the parent.
             {
@@ -103,10 +103,7 @@ namespace Administrator.Subspace.Files
         /// <exception cref="TerminalException"/>
         public void RemoveFile(String filePath, Boolean isRecursive = false)
         {
-            //Dictionary<String, File[]> relevantDirectories1 = ListDirectories(filePath);
-
             ParseFilepath(filePath, out String[] files, out String cleanedPath);
-            // TODO - Delete only contents if ends with '*'
 
             String[] directories = files[..^1];
             String filename = files[^1];
@@ -161,6 +158,13 @@ namespace Administrator.Subspace.Files
             }
 
             files = cleanedPath.Split('/', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
+            foreach (String file in files)
+            {
+                if (!file.IsAlphaNumeric())
+                {
+                    throw new TerminalException($"Filenames can only contain alpha numeric characters. '{file}' contains invalid characters.");
+                }
+            }
         }
     }
 }
