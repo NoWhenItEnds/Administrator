@@ -30,6 +30,9 @@ namespace Administrator.UI
         [ExportGroup("Resources")]
         [Export] private PackedScene _outputLabelPrefab;
 
+        /// <summary> An array of the sounds to play when typing. </summary>
+        [Export] Godot.Collections.Array<AudioStream> _keyboardSounds;
+
 
         /// <summary> The user's current working directory. </summary>
         private String _pwdText = "/home/admin";
@@ -72,6 +75,9 @@ namespace Administrator.UI
         /// <param name="newText"> The input's current text. </param>
         private void OnInputChanged(String newText)
         {
+            // Enqueue a typing sound effect.
+            AudioManager.Instance.QueueSoundEffect(_keyboardSounds.PickRandom());
+
             String[] input = newText.Split($"{PWD_SYMBOL} ");
 
             if (input.Length > 2)       // Prevent any silly business by collapsing text that is split beyond the initial pwd.
