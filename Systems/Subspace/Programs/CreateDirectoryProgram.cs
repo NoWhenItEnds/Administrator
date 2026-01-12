@@ -9,7 +9,7 @@ namespace Administrator.Subspace.Programs
     public class CreateDirectoryProgram : TerminalProgram
     {
         /// <inheritdoc/>
-        public override String Command => "cd";
+        public override String Command => "mkdir";
 
         /// <inheritdoc/>
         public override HashSet<ParameterInformation> Parameters => new HashSet<ParameterInformation>()

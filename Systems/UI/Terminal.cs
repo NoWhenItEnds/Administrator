@@ -35,7 +35,7 @@ namespace Administrator.UI
 
 
         /// <summary> The user's current working directory. </summary>
-        private String _pwdText = "/home/admin";
+        private String _pwd = "/home/admin";
 
         /// <summary> The user's current input. </summary>
         private String _currentInput = String.Empty;
@@ -67,7 +67,7 @@ namespace Administrator.UI
             _inputNode.TextSubmitted += OnInputSubmitted;
 
             _outputPool = new ObjectPool<RichTextLabel>(_outputContainer, _outputLabelPrefab, _outputPoolSize);
-            _inputNode.Text = String.Format(INPUT_FORMAT, _pwdText, PWD_SYMBOL, String.Empty);
+            _inputNode.Text = String.Format(INPUT_FORMAT, _pwd, PWD_SYMBOL, String.Empty);
         }
 
 
@@ -97,9 +97,9 @@ namespace Administrator.UI
             }
 
             // Prevent deleting the pwd.
-            if (input[0] != _pwdText)
+            if (input[0] != _pwd)
             {
-                _inputNode.Text = String.Format(INPUT_FORMAT, _pwdText, PWD_SYMBOL, _currentInput);
+                _inputNode.Text = String.Format(INPUT_FORMAT, _pwd, PWD_SYMBOL, _currentInput);
                 _inputNode.CaretColumn = _inputNode.Text.Length;
             }
         }
@@ -121,7 +121,7 @@ namespace Administrator.UI
                     HISTORY.Add(_currentInput);
                 }
 
-                String response = GameManager.Instance.PlayerComputer.SubmitCommand(_pwdText, _currentInput);
+                String response = GameManager.Instance.PlayerComputer.SubmitCommand(_pwd, _currentInput);
                 if (!String.IsNullOrWhiteSpace(response))   // Don't print a empty response.
                 {
                     RichTextLabel responseLabel = _outputPool.GetAvailableObject();
@@ -135,7 +135,7 @@ namespace Administrator.UI
                 // Reset the label.
                 _historyIndex = -1;
                 _currentInput = String.Empty;
-                _inputNode.Text = String.Format(INPUT_FORMAT, _pwdText, PWD_SYMBOL, _currentInput);
+                _inputNode.Text = String.Format(INPUT_FORMAT, _pwd, PWD_SYMBOL, _currentInput);
                 _inputNode.GrabFocus();
                 _inputNode.CaretColumn = _inputNode.Text.Length;
                 CallDeferred("ScrollToBottom"); // TODO - Not entirely working.
@@ -167,7 +167,7 @@ namespace Administrator.UI
 
                     // Update the text to the selected history. We count in reverse, taking the length minus the index.
                     _currentInput = _historyIndex >= 0 ? HISTORY[HISTORY.Count - _historyIndex - 1] : String.Empty;
-                    _inputNode.Text = String.Format(INPUT_FORMAT, _pwdText, PWD_SYMBOL, _currentInput);
+                    _inputNode.Text = String.Format(INPUT_FORMAT, _pwd, PWD_SYMBOL, _currentInput);
                     _inputNode.GrabFocus();
                     _inputNode.CaretColumn = _inputNode.Text.Length;
                 }
