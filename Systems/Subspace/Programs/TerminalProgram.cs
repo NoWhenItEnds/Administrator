@@ -31,21 +31,21 @@ namespace Administrator.Subspace.Programs
 
 
         /// <summary> The logic that is run when executing the program. </summary>
-        /// <param name="directoryPath"> The directory the command was given in. </param>
+        /// <param name="executingUser"> A reference to the user executing the command. </param>
         /// <param name="parameters"> The parameter key / value pairs given to the program. </param>
         /// <returns> The result to print to the terminal. </returns>
-        public abstract String ExecuteLogic(String directoryPath, Dictionary<ParameterInformation, String> parameters);
+        public abstract String ExecuteLogic(User executingUser, Dictionary<ParameterInformation, String> parameters);
 
 
         /// <summary> Execute the program. </summary>
-        /// <param name="directoryPath"> The directory the command was given in. </param>
+        /// <param name="executingUser"> A reference to the user executing the command. </param>
         /// <param name="arguments"> The arguments given to the program. </param>
         /// <returns> The result to print to the terminal. </returns>
-        public String Execute(String directoryPath, String[] arguments)
+        public String Execute(User executingUser, String[] arguments)
         {
             Dictionary<ParameterInformation, String> parameters = ParseParameters(arguments);
             ValidateParameters(parameters.Keys.ToArray());
-            return ExecuteLogic(directoryPath, parameters);
+            return ExecuteLogic(executingUser, parameters);
         }
 
 

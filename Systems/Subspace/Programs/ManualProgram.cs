@@ -36,7 +36,7 @@ namespace Administrator.Subspace.Programs
 
 
         /// <inheritdoc/>
-        public override String ExecuteLogic(String directoryPath, Dictionary<ParameterInformation, String> parameters)
+        public override String ExecuteLogic(User executingUser, Dictionary<ParameterInformation, String> parameters)
         {
             String programName = parameters.First(x => x.Key.ShortName == "0").Value;
             TerminalProgram? program = SOURCE.Programs.FirstOrDefault(x => x.Command == programName) ?? null;

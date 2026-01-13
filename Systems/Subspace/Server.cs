@@ -30,6 +30,7 @@ namespace Administrator.Subspace
         /// <summary> A server on a network. </summary>
         public Server()
         {
+            Programs.Add(new ChangeDirectoryProgram(this));
             Programs.Add(new CreateDirectoryProgram(this));
             Programs.Add(new DateProgram(this));
             Programs.Add(new EchoProgram(this));
@@ -38,7 +39,7 @@ namespace Administrator.Subspace
             Programs.Add(new RemoveFileProgram(this));
         }
 
-        public String SubmitCommand(String directoryPath, String command)
+        public String SubmitCommand(User executingUser, String command)
         {
             String[] formattedCommand = Regex.Matches(command, INPUT_PATTERN)
                 .Cast<Match>()
@@ -67,7 +68,7 @@ namespace Administrator.Subspace
                     {
                         arguments.Insert(0, result);
                     }
-                    result = DoCommand(directoryPath, section.First(), arguments.ToArray());
+                    result = DoCommand(executingUser, section.First(), arguments.ToArray());
                 }
             }
             catch (TerminalException exception)
@@ -85,14 +86,14 @@ namespace Administrator.Subspace
         }
 
 
-        private String DoCommand(String directoryPath, String command, String[] arguments)
+        private String DoCommand(User executingUser, String command, String[] arguments)
         {
             String response = $"'{command}' is not recognised as the name of an operable program, command, or script.";
 
             TerminalProgram? program = Programs.FirstOrDefault(x => x.Command == command) ?? null;
             if (program != null)
             {
-                response = program.Execute(directoryPath, arguments);
+                response = program.Execute(executingUser, arguments);
             }
 
             return response;

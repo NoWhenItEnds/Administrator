@@ -26,7 +26,7 @@ namespace Administrator.Subspace.Programs
 
 
         /// <inheritdoc/>
-        public override String ExecuteLogic(String directoryPath, Dictionary<ParameterInformation, String> parameters)
+        public override String ExecuteLogic(User executingUser, Dictionary<ParameterInformation, String> parameters)
         {
             return parameters.First(x => x.Key.ShortName == "0").Value;
         }

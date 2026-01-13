@@ -28,13 +28,13 @@ namespace Administrator.Subspace.Programs
 
 
         /// <inheritdoc/>
-        public override String ExecuteLogic(String directoryPath, Dictionary<ParameterInformation, String> parameters)
+        public override String ExecuteLogic(User executingUser, Dictionary<ParameterInformation, String> parameters)
         {
             StringBuilder resultDirectories = new StringBuilder();
             StringBuilder resultFiles = new StringBuilder();
 
             // Build the search path.
-            String searchPath = directoryPath;
+            String searchPath = SOURCE.Files.GetWorkingDirectory(executingUser);
 
             foreach (KeyValuePair<ParameterInformation, String> parameter in parameters)
             {

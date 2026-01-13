@@ -25,7 +25,7 @@ namespace Administrator.Subspace.Programs
 
 
         /// <inheritdoc/>
-        public override String ExecuteLogic(String directoryPath, Dictionary<ParameterInformation, String> parameters)
+        public override String ExecuteLogic(User executingUser, Dictionary<ParameterInformation, String> parameters)
         {
             DateTime time = DateTime.Now;
 

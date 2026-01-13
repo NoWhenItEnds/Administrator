@@ -12,16 +12,19 @@ namespace Administrator.Subspace.Files
         /// <summary> The filesystem's directory data structure, mapping the directory path to the files within it. </summary>
         private Dictionary<String, HashSet<File>> _directories = new Dictionary<String, HashSet<File>>();
 
+        /// <summary> A map of the system's users and their working directory. </summary>
+        private Dictionary<User, String> _users = new Dictionary<User, String>();
+
 
         /// <summary> A server's filesystem. </summary>
-        /// <param name="users"> A list of the system's initial usernames. </param>
-        public FileSystem(String[] users)
+        /// <param name="usernames"> A list of the system's initial usernames. </param>
+        public FileSystem(String[] usernames)
         {
             CreateDirectory($"/etc", true);
             CreateDirectory($"/var", true);
-            foreach (String user in users)
+            foreach (String user in usernames)
             {
-                CreateDirectory($"/home/{user}", true);
+                CreateUser(user);
             }
         }
 
@@ -141,6 +144,53 @@ namespace Administrator.Subspace.Files
                 _directories[parentDirectory].RemoveWhere(x => x.Name == filename);
             }
         }
+
+
+        /// <summary> Create a new user on the filesystem. </summary>
+        /// <param name="username"> The user's display name. </param>
+        /// <returns> The created user. </returns>
+        /// <exception cref="TerminalException"/>
+        public User CreateUser(String username)
+        {
+            if (_users.Keys.Any(x => x.Username == username))
+            {
+                throw new TerminalException($"User '{username}' already exists.");
+            }
+
+            String homePath = $"/home/{username}";
+            CreateDirectory(homePath, true);
+            User user = new User(username);
+            _users.Add(user, homePath);
+            return user;
+        }
+
+
+        /// <summary> Set the user's current working directory on the filesystem. </summary>
+        /// <param name="user"> A reference to the user. </param>
+        /// <param name="newDirectoryPath"> The new, absolute, directory path. </param>
+        /// <exception cref="TerminalException"/>
+        public void SetUserWorkingDirectory(User user, String newDirectoryPath)
+        {
+            if (_directories.ContainsKey(newDirectoryPath))
+            {
+                _users[user] = newDirectoryPath;
+            }
+            else
+            {
+                throw new TerminalException($"The directory path, '{newDirectoryPath}', doesn't exist on the filesystem.");
+            }
+        }
+
+
+        /// <summary> Get the users within the filesystem. </summary>
+        /// <returns> An array of accessible users. </returns>
+        public User[] GetUsers() => _users.Keys.ToArray();
+
+
+        /// <summary> Get the given user's working directory. </summary>
+        /// <param name="user"> A reference to the user to search for. </param>
+        /// <returns> The absolute working directory path. </returns>
+        public String GetWorkingDirectory(User user) => _users.TryGetValue(user, out String? directoryPath) ? directoryPath : throw new TerminalException($"The given user '{user.Username}' doesn't exist on the filesystem.");
 
 
         /// <summary> Separate a filepath into its directory components. </summary>

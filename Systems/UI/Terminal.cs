@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Administrator.Managers;
+using Administrator.Subspace;
 using Administrator.Utilities;
 using Godot;
 
@@ -34,8 +35,12 @@ namespace Administrator.UI
         [Export] Godot.Collections.Array<AudioStream> _keyboardSounds;
 
 
-        /// <summary> The user's current working directory. </summary>
-        private String _pwd = "/home/admin";
+        /// <summary> The current user the player is using on the terminal. </summary>
+        private User _currentUser = GameManager.Instance.PlayerComputer.Files.GetUsers().FirstOrDefault(x => x.Username == "admin") ?? throw new ArgumentNullException("TODO - Not this way, fix it."); // TODO - Fix it.
+
+        /// <summary> Get the terminal user's current working directory. </summary>
+        private String _workingDirectory => GameManager.Instance.PlayerComputer.Files.GetWorkingDirectory(_currentUser); // TODO - Not sure I need this.
+
 
         /// <summary> The user's current input. </summary>
         private String _currentInput = String.Empty;
@@ -67,7 +72,7 @@ namespace Administrator.UI
             _inputNode.TextSubmitted += OnInputSubmitted;
 
             _outputPool = new ObjectPool<RichTextLabel>(_outputContainer, _outputLabelPrefab, _outputPoolSize);
-            _inputNode.Text = String.Format(INPUT_FORMAT, _pwd, PWD_SYMBOL, String.Empty);
+            _inputNode.Text = String.Format(INPUT_FORMAT, _workingDirectory, PWD_SYMBOL, String.Empty);
         }
 
 
@@ -97,9 +102,9 @@ namespace Administrator.UI
             }
 
             // Prevent deleting the pwd.
-            if (input[0] != _pwd)
+            if (input[0] != _workingDirectory)
             {
-                _inputNode.Text = String.Format(INPUT_FORMAT, _pwd, PWD_SYMBOL, _currentInput);
+                _inputNode.Text = String.Format(INPUT_FORMAT, _workingDirectory, PWD_SYMBOL, _currentInput);
                 _inputNode.CaretColumn = _inputNode.Text.Length;
             }
         }
@@ -121,7 +126,7 @@ namespace Administrator.UI
                     HISTORY.Add(_currentInput);
                 }
 
-                String response = GameManager.Instance.PlayerComputer.SubmitCommand(_pwd, _currentInput);
+                String response = GameManager.Instance.PlayerComputer.SubmitCommand(_currentUser, _currentInput);
                 if (!String.IsNullOrWhiteSpace(response))   // Don't print a empty response.
                 {
                     RichTextLabel responseLabel = _outputPool.GetAvailableObject();
@@ -135,7 +140,7 @@ namespace Administrator.UI
                 // Reset the label.
                 _historyIndex = -1;
                 _currentInput = String.Empty;
-                _inputNode.Text = String.Format(INPUT_FORMAT, _pwd, PWD_SYMBOL, _currentInput);
+                _inputNode.Text = String.Format(INPUT_FORMAT, _workingDirectory, PWD_SYMBOL, _currentInput);
                 _inputNode.GrabFocus();
                 _inputNode.CaretColumn = _inputNode.Text.Length;
                 CallDeferred("ScrollToBottom"); // TODO - Not entirely working.
@@ -167,7 +172,7 @@ namespace Administrator.UI
 
                     // Update the text to the selected history. We count in reverse, taking the length minus the index.
                     _currentInput = _historyIndex >= 0 ? HISTORY[HISTORY.Count - _historyIndex - 1] : String.Empty;
-                    _inputNode.Text = String.Format(INPUT_FORMAT, _pwd, PWD_SYMBOL, _currentInput);
+                    _inputNode.Text = String.Format(INPUT_FORMAT, _workingDirectory, PWD_SYMBOL, _currentInput);
                     _inputNode.GrabFocus();
                     _inputNode.CaretColumn = _inputNode.Text.Length;
                 }

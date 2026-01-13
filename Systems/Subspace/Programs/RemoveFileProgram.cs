@@ -28,11 +28,14 @@ namespace Administrator.Subspace.Programs
 
 
         /// <inheritdoc/>
-        public override String ExecuteLogic(String directoryPath, Dictionary<ParameterInformation, String> parameters)
+        public override String ExecuteLogic(User executingUser, Dictionary<ParameterInformation, String> parameters)
         {
             String filename = parameters.First(x => x.Key.ShortName == "0").Value;
+
+            String directoryPath = SOURCE.Files.GetWorkingDirectory(executingUser);
             String newDirectoryPath = StringExtensions.BuildAbsoluteFilepath(directoryPath, filename);
             Boolean isRecursive = parameters.Keys.Any(x => x.ShortName == "r");
+
             SOURCE.Files.RemoveFile(newDirectoryPath, isRecursive);
             return String.Empty;
         }

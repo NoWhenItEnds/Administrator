@@ -27,10 +27,14 @@ namespace Administrator.Subspace.Programs
 
 
         /// <inheritdoc/>
-        public override String ExecuteLogic(String directoryPath, Dictionary<ParameterInformation, String> parameters)
+        public override String ExecuteLogic(User executingUser, Dictionary<ParameterInformation, String> parameters)
         {
-            // TODO - Implement. Have a user have a working dir on SOURCE?
-            // TODO - Implement a user data object?
+            String directoryName = parameters.First(x => x.Key.ShortName == "0").Value;
+
+            String directoryPath = SOURCE.Files.GetWorkingDirectory(executingUser);
+            String newDirectoryPath = StringExtensions.BuildAbsoluteFilepath(directoryPath, directoryName);
+
+            SOURCE.Files.SetUserWorkingDirectory(executingUser, newDirectoryPath);
             return String.Empty;
         }
     }
