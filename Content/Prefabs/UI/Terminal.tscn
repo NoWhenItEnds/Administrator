@@ -1,12 +1,8 @@
-[gd_scene load_steps=8 format=3 uid="uid://k4b1wti4dc1c"]
+[gd_scene load_steps=4 format=3 uid="uid://k4b1wti4dc1c"]
 
 [ext_resource type="Script" uid="uid://g6mopr82rll7" path="res://Systems/UI/Terminal.cs" id="1_e38vx"]
 [ext_resource type="Theme" uid="uid://qfkw5jdkcnrm" path="res://Resources/Themes/Theme_Default.tres" id="1_v7pud"]
 [ext_resource type="PackedScene" uid="uid://cy5t03qh6tfhb" path="res://Content/Prefabs/UI/Components/ConsoleOutput.tscn" id="3_4rogj"]
-[ext_resource type="AudioStream" uid="uid://17r12xj44484" path="res://Content/Audio/Effects/Keyboard/Audio_Keyboard_000.mp3" id="4_78dq6"]
-[ext_resource type="AudioStream" uid="uid://ds2lq0dcttajx" path="res://Content/Audio/Effects/Keyboard/Audio_Keyboard_001.mp3" id="5_o1dh4"]
-[ext_resource type="AudioStream" uid="uid://ml5pb63br4wu" path="res://Content/Audio/Effects/Keyboard/Audio_Keyboard_002.mp3" id="6_7aeuj"]
-[ext_resource type="AudioStream" uid="uid://cvwtqsokmnjet" path="res://Content/Audio/Effects/Keyboard/Audio_Keyboard_003.mp3" id="7_fccku"]
 
 [node name="Terminal" type="PanelContainer" node_paths=PackedStringArray("_outputContainer", "_scrollContainer", "_inputNode")]
 anchors_preset = 15
@@ -20,7 +16,6 @@ _outputContainer = NodePath("MarginContainer/ScrollContainer/Output Container")
 _scrollContainer = NodePath("MarginContainer/ScrollContainer")
 _inputNode = NodePath("MarginContainer/ScrollContainer/Output Container/Input")
 _outputLabelPrefab = ExtResource("3_4rogj")
-_keyboardSounds = Array[AudioStream]([ExtResource("4_78dq6"), ExtResource("5_o1dh4"), ExtResource("6_7aeuj"), ExtResource("7_fccku")])
 
 [node name="MarginContainer" type="MarginContainer" parent="."]
 layout_mode = 2

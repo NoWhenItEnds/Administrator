@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="KeySound" load_steps=6 format=3 uid="uid://c8mtoncjv0uwt"]
+
+[ext_resource type="AudioStream" uid="uid://17r12xj44484" path="res://Content/Audio/Effects/Keyboard/Audio_Keyboard_000.mp3" id="1_gl1rp"]
+[ext_resource type="Script" uid="uid://cgm2qu3q3p1al" path="res://Systems/Resources/KeySound.cs" id="1_jwbtc"]
+[ext_resource type="AudioStream" uid="uid://ds2lq0dcttajx" path="res://Content/Audio/Effects/Keyboard/Audio_Keyboard_001.mp3" id="2_usahs"]
+[ext_resource type="AudioStream" uid="uid://ml5pb63br4wu" path="res://Content/Audio/Effects/Keyboard/Audio_Keyboard_002.mp3" id="3_0qp3e"]
+[ext_resource type="AudioStream" uid="uid://cvwtqsokmnjet" path="res://Content/Audio/Effects/Keyboard/Audio_Keyboard_003.mp3" id="4_7om4x"]
+
+[resource]
+script = ExtResource("1_jwbtc")
+PressedSounds = Array[AudioStream]([ExtResource("1_gl1rp"), ExtResource("2_usahs")])
+ReleasedSounds = Array[AudioStream]([ExtResource("3_0qp3e"), ExtResource("4_7om4x")])
+metadata/_custom_type_script = "uid://cgm2qu3q3p1al"
