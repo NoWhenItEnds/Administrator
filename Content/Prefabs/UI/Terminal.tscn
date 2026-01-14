@@ -1,0 +1,50 @@
+[gd_scene load_steps=4 format=3 uid="uid://k4b1wti4dc1c"]
+
+[ext_resource type="Script" uid="uid://g6mopr82rll7" path="res://Systems/UI/Terminal.cs" id="1_e38vx"]
+[ext_resource type="Theme" uid="uid://qfkw5jdkcnrm" path="res://Resources/Themes/Theme_Default.tres" id="1_v7pud"]
+[ext_resource type="PackedScene" uid="uid://cy5t03qh6tfhb" path="res://Content/Prefabs/UI/Components/ConsoleOutput.tscn" id="3_4rogj"]
+
+[node name="Terminal" type="PanelContainer" node_paths=PackedStringArray("_outputContainer", "_scrollContainer", "_inputNode")]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = ExtResource("1_v7pud")
+script = ExtResource("1_e38vx")
+_outputContainer = NodePath("MarginContainer/ScrollContainer/Output Container")
+_scrollContainer = NodePath("MarginContainer/ScrollContainer")
+_inputNode = NodePath("MarginContainer/ScrollContainer/Output Container/Input")
+_outputLabelPrefab = ExtResource("3_4rogj")
+
+[node name="MarginContainer" type="MarginContainer" parent="."]
+layout_mode = 2
+theme = ExtResource("1_v7pud")
+
+[node name="ScrollContainer" type="ScrollContainer" parent="MarginContainer"]
+layout_mode = 2
+theme = ExtResource("1_v7pud")
+
+[node name="Output Container" type="VBoxContainer" parent="MarginContainer/ScrollContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme = ExtResource("1_v7pud")
+
+[node name="ConsoleOutput" parent="MarginContainer/ScrollContainer/Output Container" instance=ExtResource("3_4rogj")]
+layout_mode = 2
+text = "Windows Powershell"
+
+[node name="ConsoleOutput2" parent="MarginContainer/ScrollContainer/Output Container" instance=ExtResource("3_4rogj")]
+layout_mode = 2
+text = "Copyright (C) Microsoft Corporation. All rights reserved."
+
+[node name="ConsoleOutput3" parent="MarginContainer/ScrollContainer/Output Container" instance=ExtResource("3_4rogj")]
+layout_mode = 2
+text = " "
+
+[node name="Input" type="LineEdit" parent="MarginContainer/ScrollContainer/Output Container"]
+layout_mode = 2
+theme = ExtResource("1_v7pud")
+keep_editing_on_text_submit = true
+caret_blink = true

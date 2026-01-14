@@ -23,5 +23,6 @@ project/assembly_name="Administrator"
 
 folder_colors={
 "res://Content/": "blue",
+"res://Resources/": "green",
 "res://Systems/": "purple"
 }
