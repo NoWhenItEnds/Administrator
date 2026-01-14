@@ -16,6 +16,7 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("2_33ift")
+_terminalPrefab = ExtResource("3_hls3d")
 
 [node name="Terminal" parent="UI" instance=ExtResource("3_hls3d")]
 layout_mode = 1

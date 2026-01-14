@@ -9,7 +9,7 @@ using Godot;
 namespace Administrator.UI
 {
     /// <summary> The terminal UI the user uses to interact with the game world. </summary>
-    public partial class Terminal : PanelContainer
+    public partial class Terminal : TilingWindow
     {
         /// <summary> The container that holds both the results of the previous user input and the input node. </summary>
         [ExportGroup("Nodes")]
