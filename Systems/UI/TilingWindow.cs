@@ -7,7 +7,7 @@ namespace Administrator.UI
     {
         /// <summary> Initialise the new window. </summary>
         /// <param name="position"> The position to initially spawn the window. </param>
-        public void CreateWindow(Rect2 position)
+        public void Initialise(Rect2 position)
         {
             UpdatePosition(position);
         }
