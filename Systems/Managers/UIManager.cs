@@ -10,6 +10,16 @@ namespace Administrator.Managers
     /// <summary> The manager singleton for the game world's UI. </summary>
     public partial class UIManager : SingletonControl<UIManager>
     {
+        /// <summary> The workspace on which all the spawned windows appear. </summary>
+        [ExportGroup("Nodes")]
+        [Export] private Control _windowWorkspace;
+
+
+        /// <summary> How much padding should exist between spawned windows. </summary>
+        [ExportGroup("Settings")]
+        [Export] private Single _windowSeparation = 8f;
+
+
         /// <summary> The prefab to use for spawning terminal instances. </summary>
         [ExportGroup("Windows")]
         [Export] private PackedScene _terminalPrefab;
@@ -45,13 +55,13 @@ namespace Administrator.Managers
         {
             Terminal terminal = _terminalPrefab.Instantiate<Terminal>();
             _windows.Add(terminal);
-            AddChild(terminal);
+            _windowWorkspace.AddChild(terminal);
 
-            Rect2 newWindowPosition = GetRect();    // Use the whole window if there isn't a focused window.
+            Rect2 newWindowPosition = _windowWorkspace.GetGlobalRect(); // Use the whole window if there isn't a focused window.
             if (focusWindow != null)
             {
-                Rect2[] windowPositions = CalculateWindowPositions(focusWindow.GetRect());
-                focusWindow.UpdatePosition(windowPositions[0]); // The focused window should be set to use the first new position.
+                Rect2[] windowPositions = CalculateWindowPositions(focusWindow.GetGlobalRect(), _windowSeparation);
+                focusWindow.UpdatePosition(windowPositions[0]);         // The focused window should be set to use the first new position.
                 newWindowPosition = windowPositions[1];
             }
 
@@ -62,9 +72,10 @@ namespace Administrator.Managers
 
         /// <summary> Calculate new window positions by splitting the original. </summary>
         /// <param name="original"> The original position to split. </param>
+        /// <param name="separation"> The amount each window should be separated by. </param>
         /// <param name="splitPosition"> A percentage of the window where it should be split. </param>
         /// <returns> An ordered array of new positions for windows. The first entry will represent the original. </returns>
-        private Rect2[] CalculateWindowPositions(Rect2 original, Single splitPosition = 0.5f)
+        private Rect2[] CalculateWindowPositions(Rect2 original, Single separation, Single splitPosition = 0.5f)
         {
             Rect2[] results = new Rect2[2];
             Rect2 absoluteOriginal = original.Abs();    // Ensure we handle rects with 'negative' dimensions.

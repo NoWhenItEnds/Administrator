@@ -1,22 +1,38 @@
-[gd_scene load_steps=5 format=3 uid="uid://bgdvnsp66wpdb"]
+[gd_scene load_steps=6 format=3 uid="uid://bgdvnsp66wpdb"]
 
 [ext_resource type="Script" uid="uid://cpuax4xmb8s4a" path="res://Systems/Managers/GameManager.cs" id="1_k1v7w"]
 [ext_resource type="Script" uid="uid://dy3vyx05j53sk" path="res://Systems/Managers/UIManager.cs" id="2_33ift"]
 [ext_resource type="PackedScene" uid="uid://k4b1wti4dc1c" path="res://Content/Prefabs/UI/Terminal.tscn" id="3_hls3d"]
 [ext_resource type="Script" uid="uid://bcfypvgy65is1" path="res://Systems/Managers/AudioManager.cs" id="4_3jj2t"]
+[ext_resource type="Theme" uid="uid://qfkw5jdkcnrm" path="res://Resources/Themes/Theme_Default.tres" id="4_mtcwf"]
 
 [node name="Game" type="Node"]
 script = ExtResource("1_k1v7w")
 
-[node name="UI" type="Control" parent="."]
+[node name="UI" type="Control" parent="." node_paths=PackedStringArray("_windowWorkspace")]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+theme = ExtResource("4_mtcwf")
 script = ExtResource("2_33ift")
+_windowWorkspace = NodePath("MarginContainer/Window Workspace")
 _terminalPrefab = ExtResource("3_hls3d")
+
+[node name="MarginContainer" type="MarginContainer" parent="UI"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = ExtResource("4_mtcwf")
+
+[node name="Window Workspace" type="Control" parent="UI/MarginContainer"]
+layout_mode = 2
+theme = ExtResource("4_mtcwf")
 
 [node name="Audio" type="Node" parent="." node_paths=PackedStringArray("_musicPlayer")]
 script = ExtResource("4_3jj2t")

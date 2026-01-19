@@ -17,7 +17,7 @@ namespace Administrator.UI
         /// <param name="position"> A rect object containing the new position values. </param>
         public void UpdatePosition(Rect2 position)
         {
-            Position = position.Position;
+            GlobalPosition = position.Position;
             Size = position.Size;
         }
     }
