@@ -20,5 +20,13 @@ namespace Administrator.UI
             GlobalPosition = position.Position;
             Size = position.Size;
         }
+
+
+        /// <summary> Set the window as currently being the active focus. </summary>
+        public abstract void SetActive();
+
+
+        /// <summary> Removed the window from being the user's active focus. Perform any clean up needed to achieve that here. </summary>
+        public virtual void RemoveActive() { }
     }
 }

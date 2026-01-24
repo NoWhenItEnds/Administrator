@@ -154,6 +154,14 @@ namespace Administrator.UI
 
 
         /// <inheritdoc/>
+        public override void SetActive()
+        {
+            _inputNode.GrabFocus();
+            _inputNode.CaretColumn = _inputNode.Text.Length;
+        }
+
+
+        /// <inheritdoc/>
         public override void _Input(InputEvent @event)
         {
             if (_inputNode.HasFocus())  // Only allow input if the text input is selected.

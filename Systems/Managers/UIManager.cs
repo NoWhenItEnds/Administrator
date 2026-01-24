@@ -28,19 +28,43 @@ namespace Administrator.Managers
         /// <summary> An array of the currently active windows. </summary>
         private List<TilingWindow> _windows = new List<TilingWindow>();
 
-        private TilingWindow? _focusedWindow = null;    // TODO - Hacky. Remove with Godot's focus system.
+        /// <summary> The currently active / intractable window. </summary>
+        private TilingWindow? _activeWindow = null;
+
+
+        /// <summary> Sets the given window to being the active, intractable one. </summary>
+        /// <param name="newWindow"> The new window to set as active. </param>
+        private void SetActiveWindow(TilingWindow? newWindow)
+        {
+            if (_activeWindow != null) { _activeWindow.RemoveActive(); }
+            if (newWindow != null) { newWindow.SetActive(); }
+            _activeWindow = newWindow;
+        }
 
 
         /// <inheritdoc/>
         public override void _Input(InputEvent @event)
         {
+            // Use mouse hover to determine the selected window.
+            if (@event is InputEventMouseMotion mouse)
+            {
+                foreach (TilingWindow window in _windows)
+                {
+                    if (window.GetGlobalRect().HasPoint(mouse.GlobalPosition))
+                    {
+                        SetActiveWindow(window);
+                        break;
+                    }
+                }
+            }
+
             // Check if the user is trying to input a command.
             if (@event is InputEventKey key && key.IsJustPressed() && key.IsCommandOrControlPressed())
             {
                 switch(key.Keycode)
                 {
                     case Key.Enter:     // Open the terminal.
-                        CreateTerminal(_focusedWindow);
+                        CreateTerminal(_activeWindow);
                         break;
                     case Key.Q:         // Close the current window.
                         break;
@@ -66,7 +90,7 @@ namespace Administrator.Managers
             }
 
             terminal.Initialise(newWindowPosition);
-            _focusedWindow = terminal;
+            SetActiveWindow(terminal);
         }
 
 
